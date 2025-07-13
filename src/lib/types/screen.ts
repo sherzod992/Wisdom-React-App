@@ -1,27 +1,24 @@
-import exp from "constants";
 import { Lesson } from "./lesson";
 import { Member } from "./member";
 
 
 
-export interface AppRootState { // interface yaratilyapti
-    homePage: HomePageState; // buni ichida homepage degan bolim bor (component)
+export interface AppRootState { 
+    homePage: HomePageState; 
     lessonPage: LessonPageState;
 }
-//difination
+
 export interface HomePageState {
-    popularLesson:Lesson[];
-    newLesson:Lesson[];
+    popularLessons:Lesson[];
+    newLessons:Lesson[];
     topUsers:Member[];
 }
 
-/** PRODUCT PAGE **/
+/** LessonPage PAGE **/
 
 export interface LessonPageState{
-    teacher:Member|null;
+    admin:Member|null;
     chosenLesson: Lesson|null;
     lessons:Lesson[];
 }
 
-
-/** OrDErS PAGe **/

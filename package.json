@@ -1,5 +1,5 @@
 {
-  "name": "wisdom-react",
+  "name": "burak-react",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,6 +15,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.27.2",
+    "cookie": "^1.0.2",
     "crypto": "^1.0.1",
     "crypto-js": "^4.2.0",
     "moment": "^2.30.1",

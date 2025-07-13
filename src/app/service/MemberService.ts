@@ -1,6 +1,6 @@
 import axios from "axios";
-import { serverApi } from "../../lib/types/config";
-import { LoginInput, Member, MemberInput } from "../../lib/types/member";
+import { serverApi } from "../../lib/types/config.ts";
+import { LoginInput, Member, MemberInput } from "../../lib/types/member.ts";
 
 
 

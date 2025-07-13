@@ -1,6 +1,6 @@
 import axios from "axios";
-import { serverApi } from "../../lib/types/config";
-import { Lesson,LessonInquiry} from "../../lib/types/lesson";
+import { serverApi } from "../../lib/types/config.ts";
+import { Lesson,LessonInquiry} from "../../lib/types/lesson.ts";
 
 class LessonService {
   private readonly path: string;
