@@ -1,4 +1,4 @@
-export const serverApi: string = `${process.env.REACT_APP_API_UEL}`;
+export const serverApi: string = "http://localhost:3011";
 
 export const Messages = {
     error1: "Something went wrong!",

@@ -26,15 +26,13 @@ const actionDispatch = (dispatch:Dispatch)=>({
 })
 
 export default function HomePage() {
-  // const dispatch = useDispatch();
-  // const {setPopularLessons, setNewLessons, setTopUsers}= actionDispatch(dispatch);
-  // const lessons = new LessonService();
-  // lessons.getLessons({
-  //   page:1,
-  //   limit:4,
-  //   order:"lessonVew",
-  //   lessonCollection:LessonCollection.SCIENCE
-  // });
+  const dispatch = useDispatch();
+  const {setPopularLessons, setNewLessons, setTopUsers}= actionDispatch(dispatch);
+  const lessons = new LessonService();
+  lessons.getLessons({
+    page:1,
+    limit:4
+  });
   return (
     <div className="homepage">
       <Statistics />

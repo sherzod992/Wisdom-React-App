@@ -13,7 +13,7 @@ export interface Lesson {
     updatedAt: Date;
 }
 export interface LessonInquiry {
-    order: string;
+    order?: string;
     page: number;
     limit: number;
     lessonCollection?:LessonCollection
