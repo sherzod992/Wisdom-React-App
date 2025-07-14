@@ -32,15 +32,15 @@ export default function PopularLessons() {
             {popularLessons.length !== 0 ? (
               popularLessons.map((lesson: Lesson) => {
                 const imagePath =
-                  lesson.lessonImage?.[0]
-                    ? `${serverApi}/${lesson.lessonImage[0]}`
+                  lesson.lessonImages?.[0]
+                    ? `${serverApi}/${lesson.lessonImages[0]}`
                     : "/default.jpg"; // fallback image
 
                 return (
                   <CssVarsProvider key={lesson._id}>
                     <Card className="card">
                       <CardCover>
-                        <img src={imagePath} alt={lesson.lessonTitle} />
+                        <img src={imagePath} alt={lesson.lessonName} />
                       </CardCover>
                       <CardCover className="card-cover" />
                       <CardContent sx={{ justifyContent: "flex-end" }}>

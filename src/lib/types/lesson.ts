@@ -2,12 +2,13 @@ import { LessonCollection, LessonStatus } from "../enums/lesson.enum";
 
 export interface Lesson {
     _id: string;
+    lessonName:string;
     lessonStatus: LessonStatus;
     lessonTitle: string;
     lessonPrice: number;
     lessonDesc?: string;
     lessonVideo: string[];
-    lessonImage:string[];
+    lessonImages:string[];
     lessonViews: number;
     createdAt: Date;
     updatedAt: Date;
