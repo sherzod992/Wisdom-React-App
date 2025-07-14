@@ -1,6 +1,6 @@
 import axios from "axios";
-import { serverApi } from "../../lib/types/config";
-import { LoginInput, Member, MemberInput } from "../../lib/types/member";
+import { serverApi } from "../../lib/types/config.ts";
+import { LoginInput, Member, MemberInput } from "../../lib/types/member.ts";
 
 class MemberService {
   private readonly path: string;
@@ -9,7 +9,6 @@ class MemberService {
     this.path = serverApi;
   }
 
-  // 🏆 Eng yaxshi o‘quvchilar/ustozlar ro‘yxatini olish
   public async getTopUsers(): Promise<Member[]> {
     try {
       const url = `${this.path}/member/top-users`;
@@ -22,7 +21,6 @@ class MemberService {
     }
   }
 
-  // 🔐 Tizimga kirgan foydalanuvchi (admin yoki teacher) haqida info
   public async getCurrentMember(): Promise<Member> {
     try {
       const url = `${this.path}/member/detail`;
@@ -35,16 +33,13 @@ class MemberService {
     }
   }
 
-  // 📝 Ro‘yxatdan o‘tish
   public async signup(input: MemberInput): Promise<Member> {
     try {
       const url = `${this.path}/member/signup`;
       const result = await axios.post(url, input, { withCredentials: true });
-      console.log("signup:", result.data);
-
       const member: Member = result.data.member;
       localStorage.setItem("memberData", JSON.stringify(member));
-
+      console.log("signup:", member);
       return member;
     } catch (err) {
       console.log("signup error:", err);
@@ -52,16 +47,13 @@ class MemberService {
     }
   }
 
-  // 🔐 Tizimga kirish
   public async login(input: LoginInput): Promise<Member> {
     try {
       const url = `${this.path}/member/login`;
       const result = await axios.post(url, input, { withCredentials: true });
-      console.log("login:", result.data);
-
       const member: Member = result.data.member;
       localStorage.setItem("memberData", JSON.stringify(member));
-
+      console.log("login:", member);
       return member;
     } catch (err) {
       console.log("login error:", err);
@@ -69,14 +61,12 @@ class MemberService {
     }
   }
 
-  // 🚪 Chiqish
   public async logout(): Promise<void> {
     try {
       const url = `${this.path}/member/logout`;
       const result = await axios.post(url, {}, { withCredentials: true });
       localStorage.removeItem("memberData");
       console.log("logout:", result.data);
-      return;
     } catch (err) {
       console.log("logout error:", err);
       throw err;

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { serverApi } from "../../lib/types/config.ts"; // .ts kerak emas importda
+import { serverApi } from "../../lib/types/config.ts";
 import { Lesson, LessonInquiry } from "../../lib/types/lesson.ts";
 
 class LessonService {
@@ -9,10 +9,9 @@ class LessonService {
     this.path = serverApi;
   }
 
-  // 📦 Barcha darslarni olish (sahifalangan va filtrli)
   public async getLessons(input: LessonInquiry): Promise<Lesson[]> {
     try {
-      let url = `${this.path}/lesson/all?order=${input.order}&page=${input.page}&limit=${input.limit}`;
+      let url = `${this.path}/product/all?order=${input.order}&page=${input.page}&limit=${input.limit}`;
 
       if (input.lessonCollection) {
         url += `&lessonCollection=${input.lessonCollection}`;
@@ -32,10 +31,9 @@ class LessonService {
     }
   }
 
-  // 📘 Bitta darsni ID orqali olish
   public async getLesson(lessonId: string): Promise<Lesson> {
     try {
-      const url = `${this.path}/lesson/${lessonId}`;
+      const url = `${this.path}/product/${lessonId}`;
       console.log("GET Lesson URL:", url);
 
       const result = await axios.get(url, { withCredentials: true });

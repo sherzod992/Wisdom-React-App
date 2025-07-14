@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import Statistics from "./Statics.tsx";
-import PopularDishes from "./PopularDishes.tsx";
+import PopularDishes from "./PopularLessons.tsx";
 import "../../../css/home.css"
 import NewDishes from "./NewDishes.tsx";
 import Advertisement from "./Advertisement.tsx";
@@ -17,6 +17,7 @@ import { LessonCollection } from "../../../lib/enums/lesson.enum.ts";
 import LessonService from "../../service/LessonService.ts";
 import { Member } from "../../../lib/types/member.ts";
 import MemberService from "../../service/MemberService.ts";
+import PopularLessons from "./PopularLessons.tsx";
 
 
 const actionDispatch = (dispatch:Dispatch)=>({
@@ -28,15 +29,26 @@ const actionDispatch = (dispatch:Dispatch)=>({
 export default function HomePage() {
   const dispatch = useDispatch();
   const {setPopularLessons, setNewLessons, setTopUsers}= actionDispatch(dispatch);
-  const lessons = new LessonService();
-  lessons.getLessons({
-    page:1,
-    limit:4
-  });
+  useEffect(()=>{
+    const lesson = new LessonService();
+    lesson.getLessons({
+      page:1,
+      limit:4,
+    }).then((data)=>setPopularLessons(data)).catch((err)=>console.log(err));
+    lesson.getLessons({
+      page:1,
+      limit:4,
+      lessonCollection:LessonCollection.SCIENCE
+    }).then((data)=>setPopularLessons(data)).catch((err)=>console.log(err));
+    const member = new MemberService();
+    member.getTopUsers().then((data)=>{
+      setTopUsers(data);
+    }).catch((err) =>console.log(err))
+  },[])
   return (
     <div className="homepage">
       <Statistics />
-      <PopularDishes />
+      <PopularLessons />
       <NewDishes/>
       <Advertisement/>
       <ActiveUsers/>
