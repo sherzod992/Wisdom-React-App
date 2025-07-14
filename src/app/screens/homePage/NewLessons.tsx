@@ -2,52 +2,61 @@ import React from "react";
 
 import { Box, Container, Stack } from "@mui/material";
 import Card from '@mui/joy/Card';
-import CardCover from '@mui/joy/CardCover';
-import CardContent from '@mui/joy/CardContent';
 import Typography from '@mui/joy/Typography';
 import {CssVarsProvider} from "@mui/joy/styles"
 import VisibilityIcon from "@mui/icons-material/Visibility"
 import { AspectRatio, CardOverflow, Divider } from "@mui/joy";
-import  DescriptionOutlinedIcon  from "@mui/icons-material/DescriptionOutlined";
 
-const newDishes = [
-    { productName: "Cutlet", imgPath:'/img/cutlet.webp'},
-    { productName: "Lavash", imgPath:'/img/lavash.webp'},
-    { productName: "Kebab", imgPath:'/img/kebab-fresh.webp'},
-    { productName: "Kebab", imgPath:'/img/kebab.webp'},
-]
 
-export default function NewDishes() {
+
+import { useSelector } from "react-redux";
+import { createSelector } from "@reduxjs/toolkit";
+import { retriverNewLessons } from "./selector.ts";
+import { Lesson } from "../../../lib/types/lesson.ts";
+import { serverApi } from "../../../lib/types/config.ts";
+
+const newLessonsRetriever = createSelector (
+    retriverNewLessons, 
+    (newLessons)=>({newLessons}));
+
+
+export default function NewLessons() {
+    const {newLessons}= useSelector(newLessonsRetriever)
 return (
     <div className="new-products-frame">
     <Container>
         <Stack className="main">
-            <Box className = "category-title">Fresh Menu</Box>
+            <Box className = "category-title">New Lessons</Box>
             <Stack className="cards-frame">
                 <CssVarsProvider>
-                    {newDishes.length !== 0 ? (
+                    {newLessons.length !== 0 ? (
 
-                        newDishes.map((ele, index) => {
+                        newLessons.map((lesson:Lesson) => {
+                            const imagePath =
+                            lesson.lessonImages?.[0]
+                              ? `${serverApi}/${lesson.lessonImages[0]}`
+                              : "/default.jpg"; // fallback image  
+                                      
                             return(
-                                <Card key={index} variant="outlined" className = "card">
+                                <Card key={lesson._id} variant="outlined" className = "card">
                                 <CardOverflow>
                                 <div className="product-sale">Normal Size</div>
                                 <AspectRatio ratio="1">
-                                <img src={ele.imgPath} alt="" />
+                                <img src={imagePath} alt="" />
                                 </AspectRatio>
                                 </CardOverflow>
                                 <CardOverflow variant="soft" className = "product-detail" >
                                 <Stack className="info">
                                 <Stack flexDirection={"row"}>
                                     <Typography className = "title">
-                                        {ele.productName}
+                                        {lesson.lessonName}
                                     </Typography>
                                     <Divider sx={{ width:'2px', height:"24px", bg: "#d9d9d9"}}/>
-                                    <Typography className = {"price"}>15$</Typography>
+                                    <Typography className = {"price"}>{lesson.lessonPrice}</Typography>
                                 </Stack>
                                 <Stack>
                                     <Typography className = "views">
-                                        20
+                                        {lesson.lessonViews}
                                         <VisibilityIcon sx={{fontSize:20, marginLeft : "5px"}}/>
                                     </Typography>
                                 </Stack>
