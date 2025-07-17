@@ -9,6 +9,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import './css/index.css';
 import theme from './app/MaterialTheme/index.ts';
 import { BrowserRouter as Router } from 'react-router-dom';
+import ContextProvider from './app/context/ContextProvider.tsx';
 
 
 const container = document.getElementById("root")!;
@@ -19,7 +20,9 @@ root.render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
         <Router>
-          <App />
+        <ContextProvider>     {/* ✅ App endi context ichida */}
+        <App />
+        </ContextProvider>
         </Router>
     </ThemeProvider>
   </Provider>

@@ -1,30 +1,40 @@
 .home-navbar {
     width: 100%;
-    height: 773px;
+    height: 790px;
     display: flex;
-    background: url('/public/img/banner.webp');
-    background-size: cover; 
+    background: url('/public/img/header.png');
+    background-size: cover;
 }
 
 .home-navbar .navbar-container {
-    margin-top: 55px;
+    margin-top: 50px;
     height: 642px;
+    
 }
 
 .home-navbar .navbar-container .menu {
-    height: 50px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  height: 45px;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  border-radius: 8px;
 }
 
-.home-navbar .navbar-container .menu .brand-logo {
-    height: 30px;
-    width: 125px;
+.home-navbar .navbar-container .menu .logo {
+  
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  
 }
 .home-navbar .navbar-container .menu .links {
-    min-width: 700px;
+  
+    min-width: 750px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -77,13 +87,13 @@
 
 .home-navbar .navbar-container .header-frame {
     margin-top: 142px;
-    height: 462px;
+    height: 600px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 .home-navbar .navbar-container .header-frame .detail {
-    width: 510px;
+    width: 1000px;
     display: flex;
     flex-direction: column;
 }
@@ -125,7 +135,7 @@
     
 }
 .home-navbar .navbar-container .detail .signup .signup-button{
-width: 210px;
+width: 300px;
 height: 60px;
 border-radius: 4px;
 background: #1976d2;
@@ -146,7 +156,7 @@ line-height: normal;
   .home-navbar .navbar-container .logo-frame .logo-img {
    width: 100%;
    height: 100%;
-   background: url("/public/img/logo.webp");
+   background: url("");
    background-size: contain; 
    background-repeat: no-repeat;
    filter: invert(25%);

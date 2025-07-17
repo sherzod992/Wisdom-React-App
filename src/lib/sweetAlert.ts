@@ -1,6 +1,6 @@
 /** SweetAlertHandling **/
 import Swal from "sweetalert2";
-import { Messages } from "./types/config";
+import { Messages } from "./types/config.ts";
 
 
 export const sweetErrorHandling = async (err: any) => {

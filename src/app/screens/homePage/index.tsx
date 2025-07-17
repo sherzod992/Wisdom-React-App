@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Statistics from "./Statics.tsx";
+
 import PopularLessons from "./PopularLessons.tsx";
 import NewLessons from "./NewLessons.tsx";
 import Advertisement from "./Advertisement.tsx";
@@ -7,6 +7,7 @@ import ActiveUsers from "./ActiveUsers.tsx";
 import Events from "./Events.tsx";
 
 import "../../../css/home.css";
+import "../../../css/lesson.css"
 
 import { useDispatch } from "react-redux";
 import { Dispatch } from "@reduxjs/toolkit";
@@ -22,6 +23,7 @@ import { LessonCollection } from "../../../lib/enums/lesson.enum.ts";
 import LessonService from "../../service/LessonService.ts";
 import { Member } from "../../../lib/types/member.ts";
 import MemberService from "../../service/MemberService.ts";
+
 
 const actionDispatch = (dispatch: Dispatch) => ({
   setPopularLessons: (data: Lesson[]) => dispatch(setPopularLessons(data)),
@@ -65,7 +67,6 @@ export default function HomePage() {
 
   return (
     <div className="homepage">
-      <Statistics />
       <PopularLessons />
       <NewLessons />
       <Advertisement />
