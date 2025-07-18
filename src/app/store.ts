@@ -1,18 +1,23 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import { homePageReducer } from './screens/homePage/slice.ts';
 import { lessonPageReducer } from './screens/lessonsPage/slice.ts';
-import reduxLogger from "redux-logger"
 
 export const store = configureStore({
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   reducer: {
     homePage: homePageReducer,
-    lessonsPage: lessonPageReducer,
+    lessonsPage: lessonPageReducer,  // E'tibor bering: bu nom `selector.ts` bilan mos bo'lishi kerak
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+  devTools: process.env.NODE_ENV !== 'production', // DevTools faqat ishlab chiqishda yoqilsin
 });
 
-export type AppDispatch = typeof store.dispatch;
+// RootState tipi — store ichidagi barcha reducerlardan olingan global state tipi
 export type RootState = ReturnType<typeof store.getState>;
+
+// AppDispatch tipi — store.dispatch funksiyasining tipi
+export type AppDispatch = typeof store.dispatch;
+
+// AppThunk tipi — Redux Thunk uchun generik tipi
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   RootState,

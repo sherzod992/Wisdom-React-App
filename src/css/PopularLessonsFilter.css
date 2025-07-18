@@ -1,0 +1,125 @@
+.popular-dishes-frame {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px; /* Adjust as needed */
+    margin-bottom: 50px;
+  }
+  
+  .popular-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+  }
+  
+  .category-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  /* Styles for the filter and sort buttons - assuming Material UI's default button styles */
+  /* No specific class provided for the button stack itself, assuming it's handled by MUI's Stack component */
+  /* You might want to add specific styling if the default MUI buttons aren't sufficient, e.g.: */
+  /*
+  .popular-section .MuiButton-root {
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+  */
+  
+  
+  .cards-frame {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between cards */
+    justify-items: center; /* Center cards in the grid */
+    padding: 0 10px; /* Padding on the sides */
+  }
+  
+  .card {
+    width: 100%;
+    max-width: 350px; /* Max width for individual cards */
+    aspect-ratio: 16/9; /* Maintain aspect ratio for the image */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure images cover the card area */
+  }
+  
+  .card-cover {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allows clicks to pass through to the card */
+    z-index: 1; /* Above image, below content */
+  }
+  
+  /* Adjust CardContent for better readability on top of cover */
+  .MuiJoyCardContent-root {
+    position: relative;
+    z-index: 2; /* Ensures content is above the card-cover */
+    padding: var(--Card-padding); /* Uses Joy UI's internal padding variable */
+  }
+  
+  .no-data {
+    font-size: 1.5rem;
+    color: #777;
+    text-align: center;
+    width: 100%;
+    padding: 50px 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .category-title {
+      font-size: 2rem;
+    }
+  
+    .cards-frame {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .category-title {
+      font-size: 1.8rem;
+    }
+  
+    .cards-frame {
+      grid-template-columns: 1fr; /* Stack cards on very small screens */
+    }
+  
+    .card {
+      max-width: 90%; /* Adjust width for small screens */
+      margin: 0 auto; /* Center the card */
+    }
+  }

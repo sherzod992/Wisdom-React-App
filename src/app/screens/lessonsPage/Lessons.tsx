@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Container, Stack } from "@mui/material";
+import { Box, Container, Stack, Button } from "@mui/material";
 import Card from "@mui/joy/Card";
 import CardCover from "@mui/joy/CardCover";
 import CardContent from "@mui/joy/CardContent";
@@ -11,10 +11,12 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
-import { retriverPopularLessons } from "./selector.ts";
+import { retriverPopularLessons } from "../homePage/selector.ts";
 import { Lesson } from "../../../lib/types/lesson.ts";
 import { serverApi } from "../../../lib/types/config.ts";
-import VideoModal from "./VideoModal.tsx";
+import { LessonCollection } from "../../../lib/enums/lesson.enum.ts";
+
+import VideoModalLP from "./VideoModelLP.tsx";
 
 // Redux selector
 const popularLessonsRetriever = createSelector(
@@ -25,29 +27,81 @@ const popularLessonsRetriever = createSelector(
 export default function PopularLessons() {
   const { popularLessons } = useSelector(popularLessonsRetriever);
 
-  const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const handleOpenModal = (lessonVideo: string[]) => {
-    console.log("Modal ochilmoqda", lessonVideo);
-    setSelectedVideos(lessonVideo);
+  const [priceOrder, setPriceOrder] = useState<"asc" | "desc" | null>(null);
+  const [filterCollection, setFilterCollection] = useState<LessonCollection | "ALL">("ALL");
+
+  const handleOpenModal = (lesson: Lesson) => {
+    setSelectedLesson(lesson);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setSelectedVideos(null);
+    setSelectedLesson(null);
     setModalOpen(false);
   };
+
+  // Filter + sort qilingan list
+  const filteredLessons = popularLessons
+    .filter((lesson) =>
+      filterCollection === "ALL" ? true : lesson.lessonCollection === filterCollection
+    )
+    .sort((a, b) => {
+      if (!priceOrder) return 0;
+      if (priceOrder === "asc") return a.lessonPrice - b.lessonPrice;
+      return b.lessonPrice - a.lessonPrice;
+    });
 
   return (
     <div className="popular-dishes-frame">
       <Container>
-        <Stack className="popular-section">
+        <Stack className="popular-section" spacing={2}>
           <Box className="category-title">Popular Lessons</Box>
 
+          {/* Filter & Sort */}
+          <Stack direction="row" spacing={1} mb={2}>
+            <Button
+              variant={priceOrder === "asc" ? "contained" : "outlined"}
+              onClick={() => setPriceOrder("asc")}
+            >
+              Price ↑
+            </Button>
+            <Button
+              variant={priceOrder === "desc" ? "contained" : "outlined"}
+              onClick={() => setPriceOrder("desc")}
+            >
+              Price ↓
+            </Button>
+            <Button
+              variant={!priceOrder ? "contained" : "outlined"}
+              onClick={() => setPriceOrder(null)}
+            >
+              No Price Sort
+            </Button>
+
+            {/* Filter by LessonCollection */}
+            <Button
+              variant={filterCollection === "ALL" ? "contained" : "outlined"}
+              onClick={() => setFilterCollection("ALL")}
+            >
+              All
+            </Button>
+            {Object.values(LessonCollection).map((col) => (
+              <Button
+                key={col}
+                variant={filterCollection === col ? "contained" : "outlined"}
+                onClick={() => setFilterCollection(col)}
+              >
+                {col}
+              </Button>
+            ))}
+          </Stack>
+
           <Stack className="cards-frame" spacing={2}>
-            {popularLessons.length !== 0 ? (
-              popularLessons.map((lesson: Lesson) => {
+            {filteredLessons.length !== 0 ? (
+              filteredLessons.map((lesson: Lesson) => {
                 const imagePath = lesson.lessonImages?.[0]
                   ? `${serverApi}/${lesson.lessonImages[0]}`
                   : "/default.jpg";
@@ -56,7 +110,7 @@ export default function PopularLessons() {
                   <CssVarsProvider key={lesson._id}>
                     <Card
                       className="card"
-                      onClick={() => handleOpenModal(lesson.lessonVideo)}
+                      onClick={() => handleOpenModal(lesson)}
                       sx={{ cursor: "pointer" }}
                       variant="outlined"
                     >
@@ -71,7 +125,6 @@ export default function PopularLessons() {
                           <Typography level="h2" textColor="#fff" fontSize={"lg"} mb={1}>
                             {lesson.lessonTitle}
                           </Typography>
-
                           <Typography
                             sx={{
                               fontWeight: "md",
@@ -108,14 +161,20 @@ export default function PopularLessons() {
                 );
               })
             ) : (
-              <Box className="no-data">Popular products are not available!</Box>
+              <Box className="no-data">Popular lessons are not available!</Box>
             )}
           </Stack>
         </Stack>
       </Container>
 
-      {selectedVideos && (
-        <VideoModal open={modalOpen} onClose={handleCloseModal} videoLinks={selectedVideos} />
+      {/* Video Modal */}
+      {selectedLesson && (
+        <VideoModalLP
+          open={modalOpen}
+          onClose={handleCloseModal}
+          videoLinks={selectedLesson.lessonVideo}
+          lessonDesc={selectedLesson.lessonDesc ?? ""}
+        />
       )}
     </div>
   );

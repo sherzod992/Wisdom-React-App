@@ -1,18 +1,7 @@
-import { createSelector } from "reselect"
-import { AppRootState } from "../../../lib/types/screen";
+import { RootState } from "../../store";
 
-const selectLessonsPage= (state:AppRootState)=>state.lessonPage;
+const selectLessonsPage = (state: RootState) => state.lessonsPage;
 
-
-export const retrieveAdmin= createSelector(
-    selectLessonsPage,
-     (LessonsPage)=>LessonsPage.admin
-);
-export const retrieveLessonDetail = createSelector(
-    selectLessonsPage,
-     (LessonsPage)=>LessonsPage.lessonDetail
-);
-export const retrieveLessons = createSelector(
-    selectLessonsPage,
-     (LessonsPage)=>LessonsPage.lessons
-); 
+export const retrieveLessonDetail = (state: RootState) => selectLessonsPage(state).lessonDetail;
+export const retrieveLessons = (state: RootState) => selectLessonsPage(state).lessons;
+export const retrieveAdmin = (state: RootState) => selectLessonsPage(state).admin;

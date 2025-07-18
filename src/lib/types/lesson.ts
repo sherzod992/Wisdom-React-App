@@ -12,6 +12,7 @@ export interface Lesson {
     lessonViews: number;
     createdAt: Date;
     updatedAt: Date;
+    lessonCollection:LessonCollection
 }
 export interface LessonInquiry {
     order?: string;

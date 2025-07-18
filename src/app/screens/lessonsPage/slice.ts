@@ -1,28 +1,35 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { LessonPageState } from "../../../lib/types/screen.ts";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Lesson } from "../../../lib/types/lesson";
+import { Member } from "../../../lib/types/member";
 
-const initialState: LessonPageState = {
-    admin: null,
-    lessonDetail: null,
-    lessons: [],
+interface LessonsState {
+  lessonDetail: Lesson | null;
+  lessons: Lesson[];
+  admin: Member | null;
+}
+
+const initialState: LessonsState = {
+  lessonDetail: null,
+  lessons: [],
+  admin: null,
 };
 
 const lessonPageSlice = createSlice({
-    name: "lessonPage", // 🔄 kichik harf bilan nomlash – redux reducer nomi bilan mos bo'lishi kerak
-    initialState,
-    reducers: {
-        setadmin: (state, action) => {
-            state.admin = action.payload;
-        },
-        setLessonDetail: (state, action) => {
-            state.lessonDetail = action.payload; // ✅ to‘g‘ri maydon
-        },
-        setLessons: (state, action) => {
-            state.lessons = action.payload; // ✅ to‘g‘ri maydon
-        }
-    }
+  name: "lessonPage",
+  initialState,
+  reducers: {
+    setLessonDetail(state, action: PayloadAction<Lesson>) {
+      state.lessonDetail = action.payload;
+    },
+    setLessons(state, action: PayloadAction<Lesson[]>) {
+      state.lessons = action.payload;
+    },
+    setadmin(state, action: PayloadAction<Member>) {
+      state.admin = action.payload;
+    },
+  },
 });
 
-export const { setadmin,setLessonDetail,setLessons } = lessonPageSlice.actions;
+export const { setLessonDetail, setLessons, setadmin } = lessonPageSlice.actions;
 export const lessonPageReducer = lessonPageSlice.reducer;
-export default lessonPageSlice.reducer; // ✅ to‘g‘ri export
+export default lessonPageSlice.reducer;

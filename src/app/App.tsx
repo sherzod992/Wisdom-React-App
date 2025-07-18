@@ -91,7 +91,7 @@ function App() {
 
       <Switch>
         <Route path="/lessons">
-          <LessonsPage />
+          <LessonsPage onAdd={onAdd}/>
           {/* onAdd={onAdd} */}
         </Route>
         <Route path="/orders">
