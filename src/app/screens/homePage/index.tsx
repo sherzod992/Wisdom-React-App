@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import PopularLessons from "./PopularLessons.tsx";
 import NewLessons from "./NewLessons.tsx";
-import Advertisement from "./Advertisement.tsx";
+
 import ActiveUsers from "./ActiveUsers.tsx";
 import Events from "./Events.tsx";
 
@@ -69,7 +69,6 @@ export default function HomePage() {
     <div className="homepage">
       <PopularLessons />
       <NewLessons />
-      <Advertisement />
       <ActiveUsers />
       <Events />
     </div>

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Box, Container, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material"; // Import Select, MenuItem, FormControl, InputLabel
+import { Box, Container, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import Card from "@mui/joy/Card";
 import CardCover from "@mui/joy/CardCover";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import { CssVarsProvider } from "@mui/joy/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { CardOverflow } from "@mui/joy";
+import { AspectRatio, CardOverflow, Divider } from "@mui/joy";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // Add this import for a money icon
 
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
@@ -63,10 +64,9 @@ export default function PopularLessons() {
               <Box className="category-title" sx={{ mb: 2 }}>
                 Popular Lessons
               </Box>
-    
+
               <Stack spacing={2}>
 
-    
                 {/* Lesson Collection Filter */}
                 <FormControl fullWidth>
                   <InputLabel id="lesson-collection-select-label">Collection</InputLabel>
@@ -84,8 +84,8 @@ export default function PopularLessons() {
                     ))}
                   </Select>
                 </FormControl>
-                                {/* Price Sort Buttons (vertical) */}
-                                <Button
+            
+                <Button
                   variant={priceOrder === "asc" ? "contained" : "outlined"}
                   onClick={() => setPriceOrder("asc")}
                   fullWidth
@@ -108,69 +108,108 @@ export default function PopularLessons() {
                 </Button>
               </Stack>
             </Box>
-    
-            {/* O‘ngdagi video kartalar qismi */}
+
             
+
             <Stack className="cards-frame" spacing={2} sx={{ flexGrow: 1 }}>
               {filteredLessons.length !== 0 ? (
                 filteredLessons.map((lesson: Lesson) => {
                   const imagePath = lesson.lessonImages?.[0]
                     ? `${serverApi}/${lesson.lessonImages[0]}`
                     : "/default.jpg";
-    
-                  return (
-                    <CssVarsProvider key={lesson._id}>
-                      <Card
-                        className="card"
-                        onClick={() => handleOpenModal(lesson)}
-                        sx={{ cursor: "pointer" }}
-                        variant="outlined"
-                      >
-                        <CardCover>
-                          <img src={imagePath} alt={lesson.lessonDesc} />
-                        </CardCover>
-    
-                        <CardCover className="card-cover" />
-    
-                        <CardContent sx={{ justifyContent: "flex-end" }}>
-                          <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                            <Typography level="h2" textColor="#fff" fontSize={"lg"} mb={1}>
-                              {lesson.lessonTitle}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontWeight: "md",
-                                color: "neutral.300",
-                                alignItems: "center",
-                                display: "flex",
-                              }}
-                            >
-                              {lesson.lessonViews}
-                              <VisibilityIcon sx={{ fontSize: 25, marginLeft: "5px" }} />
-                            </Typography>
+                    // onClick={() => handleOpenModal(lesson)}
+                    return (
+                      <div className="popular-dishes-frame">
+                        <Container>
+                          <Stack className="popular-section">
+                            <Box></Box>
+                            <Stack className="cards-frame" direction="row" flexWrap="wrap" gap={3}>
+                              {popularLessons.length !== 0 ? (
+                                popularLessons.map((lesson: Lesson) => {
+                                  const imagePath = lesson.lessonImages?.[0]
+                                    ? `${serverApi}/${lesson.lessonImages[0]}`
+                                    : "/default.jpg";
+                  
+                                  return (
+                                    <CssVarsProvider key={lesson._id}>
+                                      <Card
+                                        variant="outlined"
+                                        sx={{ width: 320, cursor: "pointer" }}
+                                        onClick={() => handleOpenModal(lesson)}
+                                      >
+                                        <CardOverflow>
+                                          <AspectRatio ratio="1">
+                                            <img
+                                              src={imagePath}
+                                              loading="lazy"
+                                              alt={lesson.lessonTitle}
+                                            />
+                                          </AspectRatio>
+                                        </CardOverflow>
+                  
+                                        <CardContent>
+                                          <Typography
+                                            sx={{
+                                              fontWeight: 'bold',
+                                              color: 'black',
+                                              fontSize: '1.3rem',
+                                              mb: 0.5
+                                            }}
+                                          >
+                                            ${lesson.lessonPrice}
+                                          </Typography>
+                                          <Typography level="title-md">{lesson.lessonTitle}</Typography>
+                                          <Typography level="body-xs" sx={{ mt: 0.5 }}>
+                                            {lesson.lessonName} Lessons
+                                          </Typography>
+                                        </CardContent>
+                  
+                                        <CardOverflow variant="soft" sx={{ bgcolor: 'background.level2' }}>
+                                          <Divider inset="context" />
+                                          <CardContent orientation="horizontal" sx={{ gap: 1.5 }}>
+                  
+                                            <Divider orientation="vertical" />
+                                            <Typography
+                                              level="body-xs"
+                                              textColor="text.secondary"
+                                              sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
+                                            >
+                                              <DescriptionOutlinedIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                                              {lesson.lessonDesc
+                                                ? lesson.lessonDesc.slice(0, 30) + "..."
+                                                : lesson.lessonDesc}
+                                            </Typography>
+                                            <Typography
+                                              level="body-xs"
+                                              textColor="text.secondary"
+                                              sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
+                                            >
+                                              {lesson.lessonViews || 99}
+                                              <VisibilityIcon sx={{ fontSize: 26, ml: 0.5 }} />
+                                            </Typography>
+                                          </CardContent>
+                                        </CardOverflow>
+                                      </Card>
+                                    </CssVarsProvider>
+                                  );
+                                })
+                              ) : (
+                                <Box className="no-data">Popular lessons are not available!</Box>
+                              )}
+                            </Stack>
                           </Stack>
-                        </CardContent>
-    
-                        <CardOverflow
-                          sx={{
-                            display: "flex",
-                            gap: 1.5,
-                            py: 1.5,
-                            px: "var(--Card-padding)",
-                            borderTop: "1px solid",
-                            height: "60px",
-                          }}
-                        >
-                          <Typography
-                            startDecorator={<DescriptionOutlinedIcon />}
-                            textColor={"neutral.300"}
-                          >
-                            {lesson.lessonDesc}
-                          </Typography>
-                        </CardOverflow>
-                      </Card>
-                    </CssVarsProvider>
-                  );
+                        </Container>
+                  
+                        {selectedLesson && (
+                            <VideoModalLP
+                            open={modalOpen}
+                            onClose={handleCloseModal}
+                            videoLinks={selectedLesson.lessonVideo}
+                          lessonDesc={selectedLesson.lessonDesc ?? ""}
+                  />
+        )}
+                      </div>
+                    );
                 })
               ) : (
                 <Box className="no-data">Popular lessons are not available!</Box>
@@ -178,16 +217,8 @@ export default function PopularLessons() {
             </Stack>
           </Box>
         </Container>
-    
-        {/* Video Modal */}
-        {selectedLesson && (
-          <VideoModalLP
-            open={modalOpen}
-            onClose={handleCloseModal}
-            videoLinks={selectedLesson.lessonVideo}
-            lessonDesc={selectedLesson.lessonDesc ?? ""}
-          />
-        )}
+
+        
       </div>
     );
 }

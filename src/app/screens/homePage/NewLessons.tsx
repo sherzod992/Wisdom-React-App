@@ -26,7 +26,7 @@ return (
     <div className="new-products-frame">
     <Container>
         <Stack className="main">
-            <Box className = "category-title">New Lessons</Box>
+            <Box className = "category-title">새로운 강의</Box>
             <Stack className="cards-frame">
                 <CssVarsProvider>
                     {newLessons.length !== 0 ? (
@@ -40,7 +40,7 @@ return (
                             return(
                                 <Card key={lesson._id} variant="outlined" className = "card">
                                 <CardOverflow>
-                                <div className="product-sale">Normal Size</div>
+                                <div className="product-sale">인기 많은 강의</div>
                                 <AspectRatio ratio="1">
                                 <img src={imagePath} alt="" />
                                 </AspectRatio>
