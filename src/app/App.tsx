@@ -25,6 +25,7 @@ import { sweetErrorHandling, sweetTopSuccessAlert } from "../lib/sweetAlert.ts";
 import MemberService from "./service/MemberService.ts";
 import { useGlobals } from "../hooks/useGlobals.ts";
 import ContextProvider from "./context/ContextProvider.tsx";
+import LessonsPage from "./screens/lessonsPage/index.tsx";
 
 function App() {
   const location = useLocation();
@@ -89,8 +90,8 @@ function App() {
       )}
 
       <Switch>
-        <Route path="/products">
-          
+        <Route path="/lessons">
+          <LessonsPage />
           {/* onAdd={onAdd} */}
         </Route>
         <Route path="/orders">

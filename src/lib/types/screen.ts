@@ -18,7 +18,7 @@ export interface HomePageState {
 
 export interface LessonPageState{
     admin:Member|null;
-    chosenLesson: Lesson|null;
+    lessonDetail: Lesson|null;
     lessons:Lesson[];
 }
 

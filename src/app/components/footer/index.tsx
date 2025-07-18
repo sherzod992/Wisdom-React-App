@@ -40,7 +40,7 @@ export default function Footer() {
                 <Box className={"foot-category-title"}>Bo'limlar</Box>
                 <Box className={"foot-category-link"}>
                   <Link to="/">Home</Link>
-                  <Link to="/products">Products</Link>
+                  <Link to="/lessons">Lessons</Link>
                   {authMember && <Link to="/orders">Orders</Link>}
                   <Link to="/help">Help</Link>
                 </Box>
