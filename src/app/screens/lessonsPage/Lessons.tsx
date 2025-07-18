@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Container, Stack, Button } from "@mui/material";
+import { Box, Container, Stack, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material"; // Import Select, MenuItem, FormControl, InputLabel
 import Card from "@mui/joy/Card";
 import CardCover from "@mui/joy/CardCover";
 import CardContent from "@mui/joy/CardContent";
@@ -54,128 +54,140 @@ export default function PopularLessons() {
       return b.lessonPrice - a.lessonPrice;
     });
 
-  return (
-    <div className="popular-dishes-frame">
-      <Container>
-        <Stack className="popular-section" spacing={2}>
-          <Box className="category-title">Popular Lessons</Box>
+    return (
+      <div className="popular-dishes-frame">
+        <Container>
+          <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+            {/* Chapdagi filtrlar paneli */}
+            <Box sx={{ minWidth: 220 }}>
+              <Box className="category-title" sx={{ mb: 2 }}>
+                Popular Lessons
+              </Box>
+    
+              <Stack spacing={2}>
 
-          {/* Filter & Sort */}
-          <Stack direction="row" spacing={1} mb={2}>
-            <Button
-              variant={priceOrder === "asc" ? "contained" : "outlined"}
-              onClick={() => setPriceOrder("asc")}
-            >
-              Price ↑
-            </Button>
-            <Button
-              variant={priceOrder === "desc" ? "contained" : "outlined"}
-              onClick={() => setPriceOrder("desc")}
-            >
-              Price ↓
-            </Button>
-            <Button
-              variant={!priceOrder ? "contained" : "outlined"}
-              onClick={() => setPriceOrder(null)}
-            >
-              No Price Sort
-            </Button>
-
-            {/* Filter by LessonCollection */}
-            <Button
-              variant={filterCollection === "ALL" ? "contained" : "outlined"}
-              onClick={() => setFilterCollection("ALL")}
-            >
-              All
-            </Button>
-            {Object.values(LessonCollection).map((col) => (
-              <Button
-                key={col}
-                variant={filterCollection === col ? "contained" : "outlined"}
-                onClick={() => setFilterCollection(col)}
-              >
-                {col}
-              </Button>
-            ))}
-          </Stack>
-
-          <Stack className="cards-frame" spacing={2}>
-            {filteredLessons.length !== 0 ? (
-              filteredLessons.map((lesson: Lesson) => {
-                const imagePath = lesson.lessonImages?.[0]
-                  ? `${serverApi}/${lesson.lessonImages[0]}`
-                  : "/default.jpg";
-
-                return (
-                  <CssVarsProvider key={lesson._id}>
-                    <Card
-                      className="card"
-                      onClick={() => handleOpenModal(lesson)}
-                      sx={{ cursor: "pointer" }}
-                      variant="outlined"
-                    >
-                      <CardCover>
-                        <img src={imagePath} alt={lesson.lessonDesc} />
-                      </CardCover>
-
-                      <CardCover className="card-cover" />
-
-                      <CardContent sx={{ justifyContent: "flex-end" }}>
-                        <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                          <Typography level="h2" textColor="#fff" fontSize={"lg"} mb={1}>
-                            {lesson.lessonTitle}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontWeight: "md",
-                              color: "neutral.300",
-                              alignItems: "center",
-                              display: "flex",
-                            }}
-                          >
-                            {lesson.lessonViews}
-                            <VisibilityIcon sx={{ fontSize: 25, marginLeft: "5px" }} />
-                          </Typography>
-                        </Stack>
-                      </CardContent>
-
-                      <CardOverflow
-                        sx={{
-                          display: "flex",
-                          gap: 1.5,
-                          py: 1.5,
-                          px: "var(--Card-padding)",
-                          borderTop: "1px solid",
-                          height: "60px",
-                        }}
+    
+                {/* Lesson Collection Filter */}
+                <FormControl fullWidth>
+                  <InputLabel id="lesson-collection-select-label">Collection</InputLabel>
+                  <Select
+                    labelId="lesson-collection-select-label"
+                    value={filterCollection}
+                    label="Collection"
+                    onChange={(e) => setFilterCollection(e.target.value as LessonCollection | "ALL")}
+                  >
+                    <MenuItem value="ALL">All</MenuItem>
+                    {Object.values(LessonCollection).map((col) => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                                {/* Price Sort Buttons (vertical) */}
+                                <Button
+                  variant={priceOrder === "asc" ? "contained" : "outlined"}
+                  onClick={() => setPriceOrder("asc")}
+                  fullWidth
+                >
+                  Price ↑
+                </Button>
+                <Button
+                  variant={priceOrder === "desc" ? "contained" : "outlined"}
+                  onClick={() => setPriceOrder("desc")}
+                  fullWidth
+                >
+                  Price ↓
+                </Button>
+                <Button
+                  variant={!priceOrder ? "contained" : "outlined"}
+                  onClick={() => setPriceOrder(null)}
+                  fullWidth
+                >
+                  No Price Sort
+                </Button>
+              </Stack>
+            </Box>
+    
+            {/* O‘ngdagi video kartalar qismi */}
+            
+            <Stack className="cards-frame" spacing={2} sx={{ flexGrow: 1 }}>
+              {filteredLessons.length !== 0 ? (
+                filteredLessons.map((lesson: Lesson) => {
+                  const imagePath = lesson.lessonImages?.[0]
+                    ? `${serverApi}/${lesson.lessonImages[0]}`
+                    : "/default.jpg";
+    
+                  return (
+                    <CssVarsProvider key={lesson._id}>
+                      <Card
+                        className="card"
+                        onClick={() => handleOpenModal(lesson)}
+                        sx={{ cursor: "pointer" }}
+                        variant="outlined"
                       >
-                        <Typography
-                          startDecorator={<DescriptionOutlinedIcon />}
-                          textColor={"neutral.300"}
+                        <CardCover>
+                          <img src={imagePath} alt={lesson.lessonDesc} />
+                        </CardCover>
+    
+                        <CardCover className="card-cover" />
+    
+                        <CardContent sx={{ justifyContent: "flex-end" }}>
+                          <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                            <Typography level="h2" textColor="#fff" fontSize={"lg"} mb={1}>
+                              {lesson.lessonTitle}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontWeight: "md",
+                                color: "neutral.300",
+                                alignItems: "center",
+                                display: "flex",
+                              }}
+                            >
+                              {lesson.lessonViews}
+                              <VisibilityIcon sx={{ fontSize: 25, marginLeft: "5px" }} />
+                            </Typography>
+                          </Stack>
+                        </CardContent>
+    
+                        <CardOverflow
+                          sx={{
+                            display: "flex",
+                            gap: 1.5,
+                            py: 1.5,
+                            px: "var(--Card-padding)",
+                            borderTop: "1px solid",
+                            height: "60px",
+                          }}
                         >
-                          {lesson.lessonDesc}
-                        </Typography>
-                      </CardOverflow>
-                    </Card>
-                  </CssVarsProvider>
-                );
-              })
-            ) : (
-              <Box className="no-data">Popular lessons are not available!</Box>
-            )}
-          </Stack>
-        </Stack>
-      </Container>
-
-      {/* Video Modal */}
-      {selectedLesson && (
-        <VideoModalLP
-          open={modalOpen}
-          onClose={handleCloseModal}
-          videoLinks={selectedLesson.lessonVideo}
-          lessonDesc={selectedLesson.lessonDesc ?? ""}
-        />
-      )}
-    </div>
-  );
+                          <Typography
+                            startDecorator={<DescriptionOutlinedIcon />}
+                            textColor={"neutral.300"}
+                          >
+                            {lesson.lessonDesc}
+                          </Typography>
+                        </CardOverflow>
+                      </Card>
+                    </CssVarsProvider>
+                  );
+                })
+              ) : (
+                <Box className="no-data">Popular lessons are not available!</Box>
+              )}
+            </Stack>
+          </Box>
+        </Container>
+    
+        {/* Video Modal */}
+        {selectedLesson && (
+          <VideoModalLP
+            open={modalOpen}
+            onClose={handleCloseModal}
+            videoLinks={selectedLesson.lessonVideo}
+            lessonDesc={selectedLesson.lessonDesc ?? ""}
+          />
+        )}
+      </div>
+    );
 }
