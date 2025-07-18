@@ -23,9 +23,8 @@ export default function Footer() {
               <img width={"100px"} src={"/icons/burak.svg"} />
             </Box>
             <Box className={"foot-desc-txt"}>
-              Focusing on the gourmet Turkish breakfast as well as the youth
-              society, CZN Burak Gurme aims to bring Turkish cuisine back. CZN
-              Burak Gurme creates an illusion with its cuisine.
+             모든 것은 따져 보면 지식에 달려 있고, 이 지식이 전세계적으로 날라가기 위해서는
+             우리가 노력하고 있습니다. 우리가 노력하는 것은 핵생과 선생에게 도움을 주기 위해서 이러한 공간을 마련 해 놓았습니다
             </Box>
             <Box className="sns-context">
               <img src={"/icons/facebook.svg"} />
@@ -41,7 +40,7 @@ export default function Footer() {
                 <Box className={"foot-category-link"}>
                   <Link to="/">Home</Link>
                   <Link to="/lessons">Lessons</Link>
-                  {authMember && <Link to="/orders">Orders</Link>}
+                  {authMember && <Link to="/orders">OrdersLesson</Link>}
                   <Link to="/help">Help</Link>
                 </Box>
               </Box>
@@ -57,19 +56,19 @@ export default function Footer() {
                 >
                   <Box flexDirection={"row"} className={"find-us"}>
                     <span>L.</span>
-                    <div>Downtown, Dubai</div>
+                    <div>충청남도 아산시</div>
                   </Box>
                   <Box className={"find-us"}>
                     <span>P.</span>
-                    <div>+971 4 554 7777</div>
+                    <div>01058884005</div>
                   </Box>
                   <Box className={"find-us"}>
                     <span>E.</span>
-                    <div>devexuz@gmail.com</div>
+                    <div>sherzod_dev</div>
                   </Box>
                   <Box className={"find-us"}>
                     <span>H.</span>
-                    <div>Visit 24 hours</div>
+                    <div>시간 없으니까 있는 거 그대로 사용하세요</div>
                   </Box>
                 </Box>
               </Box>
