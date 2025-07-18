@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
 
 // Sahifalar va komponentlar
-import ProductPage from "./screens/productPage/index.tsx";
+
 import OrdersPage from "./screens/orderPage/index.tsx";
 import UsersPage from "./screens/usersPage/index.tsx";
 import HomePage from "./screens/homePage/index.tsx";
@@ -90,7 +90,7 @@ function App() {
 
       <Switch>
         <Route path="/products">
-          <ProductPage  />
+          
           {/* onAdd={onAdd} */}
         </Route>
         <Route path="/orders">

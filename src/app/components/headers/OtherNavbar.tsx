@@ -1,14 +1,15 @@
 import React, { use } from "react";
 import { Box, Button, Container, ListItemIcon, Menu, MenuItem, Stack } from "@mui/material";
 import {NavLink} from "react-router-dom"
-import Basket from "./Basket.tsx";
+import Basket from "../headers/Basket.tsx";
+import { useEffect,useState } from "react";
 import { CartItem } from "../../../lib/types/search.ts";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
 import { Logout } from "@mui/icons-material";
 
 
 
-interface OtherNavbarPromps{
+interface HomeNavbarProps{
     cartItems: CartItem[];
     onAdd:(item:CartItem)=>void;
     onRemove:(item:CartItem)=>void;
@@ -20,9 +21,8 @@ interface OtherNavbarPromps{
     anchorEl:HTMLElement | null;
     handleCloseLogout:()=>void;
     handleLogoutRequest:()=>void;
-
 }
-export default function OtherNavbar(props:OtherNavbarPromps){
+export default function HomeNavbar(props:HomeNavbarProps) {
     const {cartItems,
         onAdd,
         onRemove,
@@ -34,49 +34,51 @@ export default function OtherNavbar(props:OtherNavbarPromps){
         anchorEl,
         handleCloseLogout,
         handleLogoutRequest
-        }=props;
-    const {authMember}=useGlobals();
-    return (
-      <div className="other-navbar">
+        }=props
+    const {authMember} = useGlobals();
+    
+    return <div className="other-navbar">
         <Container className="navbar-container">
             <Stack className="menu">
                 <Box>
                     <NavLink to={'/'}> 
-                        <img className='brand-logo' src="/icons/burak.svg" />
+                        <h1 className="logo">Academia Of Wisdom</h1>
                     </NavLink>
                 </Box>
                 <Stack className="links">
                     <Box className={"hover-line"} >
-                        <NavLink to={'/'}  >Home</NavLink>
+                        <NavLink to={'/'} activeClassName={"underline"}  >Home</NavLink>
                     </Box>
                     <Box className={"hover-line"}>
-                        <NavLink to={'/products'} >Products</NavLink>
+                        <NavLink to={'/products'} activeClassName={"underline"}  >Products</NavLink>
                     </Box >
                     {authMember ? (
                         <Box className={"hover-line"}>
-                            <NavLink to={'/orders'}>Orders</NavLink>
+                            <NavLink to={'/orders'} activeClassName={"underline"}>Orders</NavLink>
                         </Box>
                     ) : null}
                     {authMember ? (
                         <Box className={"hover-line"}>
-                            <NavLink to={'/member-page'}  >My Page</NavLink>
+                            <NavLink to={'/member-page'} activeClassName={"underline"} >My Page</NavLink>
                         </Box>
                     ) : null}
                     <Box className={"hover-line"}>
-                        <NavLink to={'/help'}  >Help</NavLink>
+                        <NavLink to={'/help'} activeClassName={"underline"} >Help</NavLink>
                     </Box>
                     <Basket cartItems={cartItems}onAdd={onAdd} onRemove={onRemove} onDeleteAll={onDelateAll} onDelate={onDelate}
                     />
                     {!authMember ? (
                         <Box>
-                            <Button variant="contained" className="login-button" onClick={()=>setLoginOpen(true)}>Login</Button>
+                            <Button variant="contained" className="login-button"
+                            onClick={()=>setLoginOpen(true)} 
+                            >Login</Button>
                         </Box>
                     ) : (
                         <img className="user-avatar"
                         src={authMember?.memberImage?`${authMember?.memberImage}`:"/icons/default-user.svg"}
                         aria-haspopup = {"true"}
                         onClick={handleLogOutClick} />
-                    )} 
+                    )}
                     <Menu
                         anchorEl={anchorEl}
                         open ={Boolean(anchorEl)}
@@ -121,6 +123,26 @@ export default function OtherNavbar(props:OtherNavbarPromps){
 
                 </Stack>
             </Stack>
+            {/* <Stack className="header-frame">    
+                <Stack className="detail"> 
+                <Box className = {"head-main-txt"}>다시 오신 것을 환영합니다 {authMember?.memberNick} 님</Box>
+                <Box className = "wel-txt">도움이 되는 학습</Box>
+                <Box className = "service-txt">항상 최선을 다하는 widom 입니다</Box>
+                <Box className = "signup">
+                    {!authMember ? (
+                        <Button
+                        variant={"contained"} 
+                        className={"signup-button"}
+                        onClick={()=>setSignupOpen(true)}
+                        > SIGN UP</Button>
+                    ) : null} 
+                    
+                </Box>
+                </Stack>
+                <Box className="logo-frame">
+                    <div className="logo-img"></div>
+                </Box>
+            </Stack> */}
         </Container>
     </div>
-    )}
+} 

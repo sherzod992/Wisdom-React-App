@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Container, Stack } from "@mui/material";
 import Card from "@mui/joy/Card";
 import CardCover from "@mui/joy/CardCover";
@@ -15,6 +15,9 @@ import { retriverPopularLessons } from "./selector.ts";
 import { Lesson } from "../../../lib/types/lesson.ts";
 import { serverApi } from "../../../lib/types/config.ts";
 
+import VideoModal from "./VideoModal.tsx";
+
+// Redux selector
 const popularLessonsRetriever = createSelector(
   retriverPopularLessons,
   (popularLessons) => ({ popularLessons })
@@ -23,31 +26,53 @@ const popularLessonsRetriever = createSelector(
 export default function PopularLessons() {
   const { popularLessons } = useSelector(popularLessonsRetriever);
 
+  const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = (lessonVideo: string[]) => {
+    console.log("Modal ochilmoqda", lessonVideo);
+    setSelectedVideos(lessonVideo);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedVideos(null);
+    setModalOpen(false);
+  };
+
   return (
     <div className="popular-dishes-frame">
       <Container>
         <Stack className="popular-section">
           <Box className="category-title">Popular Lessons</Box>
-          <Stack className="cards-frame">
+
+          <Stack className="cards-frame" spacing={2}>
             {popularLessons.length !== 0 ? (
               popularLessons.map((lesson: Lesson) => {
-                const imagePath =
-                  lesson.lessonImages?.[0]
-                    ? `${serverApi}/${lesson.lessonImages[0]}`
-                    : "/default.jpg"; // fallback image
+                const imagePath = lesson.lessonImages?.[0]
+                  ? `${serverApi}/${lesson.lessonImages[0]}`
+                  : "/default.jpg";
 
                 return (
                   <CssVarsProvider key={lesson._id}>
-                    <Card className="card">
+                    <Card
+                      className="card"
+                      onClick={() => handleOpenModal(lesson.lessonVideo)}
+                      sx={{ cursor: "pointer" }}
+                      variant="outlined"
+                    >
                       <CardCover>
-                        <img src={imagePath} alt={lesson.lessonName} />
+                        <img src={imagePath} alt={lesson.lessonDesc} />
                       </CardCover>
+
                       <CardCover className="card-cover" />
+
                       <CardContent sx={{ justifyContent: "flex-end" }}>
                         <Stack flexDirection={"row"} justifyContent={"space-between"}>
                           <Typography level="h2" textColor="#fff" fontSize={"lg"} mb={1}>
                             {lesson.lessonTitle}
                           </Typography>
+
                           <Typography
                             sx={{
                               fontWeight: "md",
@@ -61,6 +86,7 @@ export default function PopularLessons() {
                           </Typography>
                         </Stack>
                       </CardContent>
+
                       <CardOverflow
                         sx={{
                           display: "flex",
@@ -88,6 +114,10 @@ export default function PopularLessons() {
           </Stack>
         </Stack>
       </Container>
+
+      {selectedVideos && (
+        <VideoModal open={modalOpen} onClose={handleCloseModal} videoLinks={selectedVideos} />
+      )}
     </div>
   );
 }
