@@ -48,7 +48,7 @@ export default function PopularLessons() {
     <div className="popular-dishes-frame">
       <Container>
         <Stack className="popular-section">
-          <Box className="category-title">인기 수업 및 다음에 학습할 것 </Box>
+          <Box className="category-title">인기가 많은 수업 및 다음에 학습할 것 </Box>
           <Box></Box>
           <Stack className="cards-frame" direction="row" flexWrap="wrap" gap={3}>
             {popularLessons.length !== 0 ? (
@@ -61,7 +61,7 @@ export default function PopularLessons() {
                   <CssVarsProvider key={lesson._id}>
                     <Card
                       variant="outlined"
-                      sx={{ width: 450, cursor: "pointer" }}
+                      sx={{ width: 450, cursor: "pointer"}}
                       onClick={() => handleOpenModal(lesson.lessonVideo)}
                     >
                       <CardOverflow>

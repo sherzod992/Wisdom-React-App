@@ -8,7 +8,7 @@ import Events from "./Events.tsx";
 
 import "../../../css/home.css";
 import "../../../css/lesson.css"
-
+import "../../../css/welcome.css"
 import { useDispatch } from "react-redux";
 import { Dispatch } from "@reduxjs/toolkit";
 
@@ -23,6 +23,7 @@ import { LessonCollection } from "../../../lib/enums/lesson.enum.ts";
 import LessonService from "../../service/LessonService.ts";
 import { Member } from "../../../lib/types/member.ts";
 import MemberService from "../../service/MemberService.ts";
+import Welcome from "./welcome.tsx";
 
 
 const actionDispatch = (dispatch: Dispatch) => ({
@@ -67,6 +68,7 @@ export default function HomePage() {
 
   return (
     <div className="homepage">
+      <Welcome />
       <PopularLessons />
       <NewLessons />
       <ActiveUsers />

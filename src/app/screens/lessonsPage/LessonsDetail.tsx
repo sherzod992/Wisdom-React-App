@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import VideoModalLP from "./VideoModelLP"; // Video modal komponentingiz
 
 interface Lesson {
-  lessonVideo: string[]; // YouTube video linklari
+  lessonVideo: string[]; 
   lessonDesc: string;
-  // boshqa kerakli maydonlar
+
 }
 
 interface LessonDetailProps {

@@ -20,7 +20,7 @@ export default function Footer() {
         <Stack flexDirection={"row"} sx={{ mt: "94px" }}>
           <Stack flexDirection={"column"} style={{ width: "340px" }}>
             <Box>
-              <img width={"100px"} src={"/icons/burak.svg"} />
+              <img className="logo" width={"120px"}  src={"/img/wisdomLogo.png"} />
             </Box>
             <Box className={"foot-desc-txt"}>
              모든 것은 따져 보면 지식에 달려 있고, 이 지식이 전세계적으로 날라가기 위해서는

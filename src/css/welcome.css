@@ -1,0 +1,57 @@
+.homepage.welcome {
+    width: 100%;
+    height: 150px;
+    background: url('/public/img/teacheropa.png');
+    background-size: cover;
+  }
+  
+  /* Ichki container flex holatda, kengaytirilgan joylashuv */
+  .header-frame {
+    display: flex;
+    justify-content: space-between;
+    align-items: right;
+    flex-wrap: wrap;
+  }
+  
+  /* Matn qismi uchun */
+  .detail {
+    margin-top: 200px;
+    background-color: #ffffff;
+    max-width: 600px;
+    color: #000000;
+  
+    /* Qo‘shimchalar: */
+    border-radius: 16px;       /* Burchaklarni yumaloqlashtiradi */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Tushgan soyani beradi */
+    padding: 24px;             /* Ichki bo‘shliq */
+
+  }
+  
+  /* Salomlashuv matni */
+  .head-main-txt {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  
+
+  
+  
+  /* Logo joylashuvi */
+  .logo-frame {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Logo rasmi (orqa fonli div) */
+  .logo-img {
+    width: 100%;
+    height: 100%;
+
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
