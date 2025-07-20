@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 
 import PopularLessons from "./PopularLessons.tsx";
 import NewLessons from "./NewLessons.tsx";
+import PurchasedLessons from "./PurchasedLessons.tsx";
 
 import ActiveUsers from "./ActiveUsers.tsx";
 import Events from "./Events.tsx";
@@ -74,6 +75,7 @@ export default function HomePage({ onAdd }: HomePageProps) {
   return (
     <div className="homepage">
       <Welcome />
+      <PurchasedLessons />
       <PopularLessons onAdd={onAdd} />
       <NewLessons onAdd={onAdd} />
       <ActiveUsers />

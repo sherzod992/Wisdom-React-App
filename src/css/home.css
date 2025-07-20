@@ -507,4 +507,71 @@ justify-content: space-between;
   background-color: rgba(255, 255, 255, 1) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
+
+/* 구매 완료 버튼 스타일 */
+.purchased-button {
+  pointer-events: none !important;
+  opacity: 0.8 !important;
+}
+
+.card:hover .purchased-button {
+  background-color: rgba(76, 175, 80, 0.2) !important;
+  transform: none !important;
+}
+
+/* 구매한 강의 섹션 스타일 */
+.purchased-lessons-frame {
+  width: 100%;
+  padding: 60px 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.purchased-lessons-frame .category-title {
+  text-align: center;
+  font-family: "Roboto Serif";
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.44px;
+  color: #000000;
+  margin-bottom: 40px;
+}
+
+.purchased-cards-frame {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap; /* 세로 배치가 아닌 가로 스크롤 */
+  justify-content: flex-start;
+  gap: 30px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 20px 10px;
+  scroll-behavior: smooth;
+}
+
+.purchased-cards-frame::-webkit-scrollbar {
+  height: 10px;
+}
+
+.purchased-cards-frame::-webkit-scrollbar-thumb {
+  background-color: #1976d2;
+  border-radius: 5px;
+}
+
+.purchased-cards-frame::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.purchased-card {
+  flex: 0 0 auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.purchased-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
   

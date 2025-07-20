@@ -6,6 +6,7 @@ import Typography from '@mui/joy/Typography';
 import {CssVarsProvider} from "@mui/joy/styles"
 import VisibilityIcon from "@mui/icons-material/Visibility"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { AspectRatio, CardOverflow, Divider, Button, Box } from "@mui/joy";
 
 
@@ -17,6 +18,8 @@ import { Lesson } from "../../../lib/types/lesson.ts";
 import { CartItem } from "../../../lib/types/search.ts";
 import { serverApi } from "../../../lib/types/config.ts";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
+import useBasket from "../../../hooks/useBasket.ts";
+import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
 
 const newLessonsRetriever = createSelector (
     retriverNewLessons, 
@@ -28,18 +31,29 @@ interface NewLessonsProps {
 
 export default function NewLessons({ onAdd }: NewLessonsProps) {
     const {newLessons}= useSelector(newLessonsRetriever)
+    const { cartItems } = useBasket();
+    const { isPurchased } = usePurchasedLessons();
 
     const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
       e.stopPropagation(); // 카드 클릭 이벤트 방지
+      
+      // 이미 장바구니에 있는지 확인
+      const exist = cartItems.find(item => item._id === lesson._id);
+      
+      if (exist) {
+        await sweetTopSuccessAlert(`${lesson.lessonName}은(는) 이미 장바구니에 있습니다!`, 2000);
+        return;
+      }
+      
       const cartItem: CartItem = {
         _id: lesson._id,
-        name: lesson.lessonTitle,
+        name: lesson.lessonName, // lessonTitle 대신 lessonName 사용
         price: lesson.lessonPrice,
         image: lesson.lessonImages?.[0] || "",
         quantity: 1
       };
       onAdd(cartItem);
-      await sweetTopSuccessAlert(`${lesson.lessonTitle}이(가) 장바구니에 추가되었습니다!`, 2000);
+      await sweetTopSuccessAlert(`${lesson.lessonName}이(가) 장바구니에 추가되었습니다!`, 2000);
     };
 
 return (
@@ -64,7 +78,7 @@ return (
                                 <AspectRatio ratio="1">
                                 <img src={imagePath} alt="" />
                                 </AspectRatio>
-                                {/* 장바구니 버튼 */}
+                                {/* 장바구니 버튼 또는 구매 완료 표시 */}
                                 <Box
                                   sx={{
                                     position: "absolute",
@@ -73,15 +87,35 @@ return (
                                     zIndex: 1,
                                   }}
                                 >
-                                  <Button
-                                    variant="solid"
-                                    size="sm"
-                                    startDecorator={<ShoppingCartIcon />}
-                                    onClick={(e) => handleAddToCart(e, lesson)}
-                                    className="cart-button"
-                                  >
-                                    장바구니
-                                  </Button>
+                                  {isPurchased(lesson._id) ? (
+                                    <Button
+                                      variant="soft"
+                                      size="sm"
+                                      startDecorator={<CheckCircleIcon />}
+                                      disabled
+                                      sx={{
+                                        backgroundColor: "rgba(76, 175, 80, 0.2)",
+                                        color: "#4caf50",
+                                        cursor: "default",
+                                        "&:hover": {
+                                          backgroundColor: "rgba(76, 175, 80, 0.2)",
+                                        }
+                                      }}
+                                      className="purchased-button"
+                                    >
+                                      구매완료
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="solid"
+                                      size="sm"
+                                      startDecorator={<ShoppingCartIcon />}
+                                      onClick={(e) => handleAddToCart(e, lesson)}
+                                      className="cart-button"
+                                    >
+                                      장바구니
+                                    </Button>
+                                  )}
                                 </Box>
                                 </CardOverflow>
                                 <CardOverflow variant="soft" className = "product-detail" >

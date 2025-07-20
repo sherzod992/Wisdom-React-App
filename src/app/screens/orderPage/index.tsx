@@ -5,7 +5,6 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PausedOrders from "./PausedOrders.tsx";
-import ProcessOrders from "./ProcessOrders.tsx";
 import FinishedOrders from "./FinishedOrders.tsx";
 import "../../../css/orders.css"
 import React from "react";
@@ -91,8 +90,20 @@ export default function OrdersPage() {
     localStorage.setItem('pausedOrders', JSON.stringify(updatedPausedOrders));
     localStorage.setItem('finishedOrders', JSON.stringify(updatedFinishedOrders));
 
-    // 장바구니에서도 제거
-    onDeleteAll();
+    // 장바구니에서 결제한 아이템들 제거
+    const currentCartData = localStorage.getItem('cartData');
+    if (currentCartData) {
+      const currentCart = JSON.parse(currentCartData);
+      const updatedCart = currentCart.filter((cartItem: any) => 
+        !orderItems.some(orderItem => orderItem._id === cartItem._id)
+      );
+      localStorage.setItem('cartData', JSON.stringify(updatedCart));
+      
+      // 전체 장바구니가 비어있으면 완전히 삭제
+      if (updatedCart.length === 0) {
+        onDeleteAll();
+      }
+    }
   };
 
   const handleCancelOrder = (orderItems: OrderItem[]) => {
@@ -119,8 +130,7 @@ export default function OrdersPage() {
                   className={"table_list"}
                 >
                   <Tab label="PAUSED ORDERS" value={"1"} />
-                  <Tab label="PROCESS ORDERS" value={"2"} />
-                  <Tab label="FINISHED ORDERS" value={"3"} />
+                  <Tab label="FINISHED ORDERS" value={"2"} />
                 </Tabs>
               </Box>
             </Box>
@@ -130,7 +140,6 @@ export default function OrdersPage() {
                 onPayment={handlePayment}
                 onCancel={handleCancelOrder}
               />
-              <ProcessOrders />
               <FinishedOrders orders={finishedOrders} />
             </Stack>
           </TabContext>

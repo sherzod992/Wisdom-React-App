@@ -52,7 +52,7 @@ export default function PausedOrders({ orders, onPayment, onCancel }: PausedOrde
             <Stack>
                 {Object.keys(groupedOrders).length > 0 ? (
                     Object.entries(groupedOrders).map(([orderId, orderItems]) => {
-                        const totalPrice = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
                         const deliveryCost = 0; // 온라인 강의는 배송비 없음
                         const finalTotal = totalPrice + deliveryCost;
 
@@ -68,13 +68,9 @@ export default function PausedOrders({ orders, onPayment, onCancel }: PausedOrde
                                             <Box key={item._id} className={"orders-name-price"}>
                                                 <img src={imagePath} className={"orders-dish-img"} alt={item.name} />
                                                 <p className={"title-dish"}>{item.name}</p>
-                                                <Box className={"price-box"}>
-                                                    <p>${item.price}</p>
-                                                    <img src={"/icons/close.svg"} alt="" />
-                                                    <p>{item.quantity}</p>
-                                                    <img src={"/icons/pause.svg"} alt="" />
-                                                    <p style={{ marginLeft: "15px" }}>${(item.price * item.quantity).toFixed(2)}</p>
-                                                </Box>
+                                                                                                 <Box className={"price-box"}>
+                                                     <p>${item.price}</p>
+                                                 </Box>
                                             </Box>
                                         );
                                     })}

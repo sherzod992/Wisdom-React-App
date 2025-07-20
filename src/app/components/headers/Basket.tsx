@@ -30,7 +30,7 @@ export default function Basket({
   const open = Boolean(anchorEl);
 
   const itemsPrice = cartItems.reduce(
-    (acc, item) => acc + item.quantity * item.price,
+    (acc, item) => acc + item.price,
     0
   );
   const shippingCost = itemsPrice < 100 ? 5 : 0;
@@ -89,7 +89,7 @@ export default function Basket({
         <Stack className="basket-frame">
           <Box className="all-check-box">
             {cartItems.length === 0 ? (
-              <div>Cart is empty</div>
+              <div>장바구니가 비어 있습니다.</div>
             ) : (
               <Stack direction="row" alignItems="center">
                 <div>Cart Products</div>
@@ -117,18 +117,8 @@ export default function Basket({
                     <img src={imagePath} className="product-img" alt={item.name} />
                     <span className="product-name">{item.name}</span>
                     <p className="product-price">
-                      ${item.price} × {item.quantity}
+                      ${item.price}
                     </p>
-                    <Box sx={{ minWidth: 120 }}>
-                      <div className="col-2">
-                        <button className="remove" onClick={() => onRemove(item)}>
-                          –
-                        </button>
-                        <button className="add" onClick={() => onAdd(item)}>
-                          +
-                        </button>
-                      </div>
-                    </Box>
                   </Box>
                 );
               })}

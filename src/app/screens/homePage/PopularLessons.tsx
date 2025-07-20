@@ -18,6 +18,7 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import { retriverPopularLessons } from "./selector.ts";
@@ -26,6 +27,8 @@ import { CartItem } from "../../../lib/types/search.ts";
 import { serverApi } from "../../../lib/types/config.ts";
 import VideoModal from "./VideoModal.tsx";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
+import useBasket from "../../../hooks/useBasket.ts";
+import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
 
 // Redux selector
 const popularLessonsRetriever = createSelector(
@@ -39,30 +42,44 @@ interface PopularLessonsProps {
 
 export default function PopularLessons({ onAdd }: PopularLessonsProps) {
   const { popularLessons } = useSelector(popularLessonsRetriever);
+  const { cartItems } = useBasket();
+  const { isPurchased } = usePurchasedLessons();
   const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const handleOpenModal = (lessonVideo: string[]) => {
+  const handleOpenModal = (lessonVideo: string[], lessonId: string) => {
     setSelectedVideos(lessonVideo);
+    setSelectedLessonId(lessonId);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setSelectedVideos(null);
+    setSelectedLessonId(null);
     setModalOpen(false);
   };
 
   const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    // 이미 장바구니에 있는지 확인
+    const exist = cartItems.find(item => item._id === lesson._id);
+    
+    if (exist) {
+      await sweetTopSuccessAlert(`${lesson.lessonName}은(는) 이미 장바구니에 있습니다!`, 2000);
+      return;
+    }
+    
     const cartItem: CartItem = {
       _id: lesson._id,
-      name: lesson.lessonTitle,
+      name: lesson.lessonName, // lessonTitle 대신 lessonName 사용
       price: lesson.lessonPrice,
       image: lesson.lessonImages?.[0] || "",
       quantity: 1
     };
     onAdd(cartItem);
-    await sweetTopSuccessAlert(`${lesson.lessonTitle}이(가) 장바구니에 추가되었습니다!`, 2000);
+    await sweetTopSuccessAlert(`${lesson.lessonName}이(가) 장바구니에 추가되었습니다!`, 2000);
   };
 
   return (
@@ -83,7 +100,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                     <Card
                       variant="outlined"
                       sx={{ width: 450, cursor: "pointer", position: "relative" }}
-                      onClick={() => handleOpenModal(lesson.lessonVideo)}
+                      onClick={() => handleOpenModal(lesson.lessonVideo, lesson._id)}
                     >
                       <CardOverflow>
                         <AspectRatio ratio="1">
@@ -93,7 +110,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                             alt={lesson.lessonTitle}
                           />
                         </AspectRatio>
-                        {/* 장바구니 버튼 */}
+                        {/* 장바구니 버튼 또는 구매 완료 표시 */}
                         <Box
                           sx={{
                             position: "absolute",
@@ -102,15 +119,35 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                             zIndex: 1,
                           }}
                         >
-                          <Button
-                            variant="solid"
-                            size="sm"
-                            startDecorator={<ShoppingCartIcon />}
-                            onClick={(e) => handleAddToCart(e, lesson)}
-                            className="cart-button"
-                          >
-                            장바구니
-                          </Button>
+                          {isPurchased(lesson._id) ? (
+                            <Button
+                              variant="soft"
+                              size="sm"
+                              startDecorator={<CheckCircleIcon />}
+                              disabled
+                              sx={{
+                                backgroundColor: "rgba(76, 175, 80, 0.2)",
+                                color: "#4caf50",
+                                cursor: "default",
+                                "&:hover": {
+                                  backgroundColor: "rgba(76, 175, 80, 0.2)",
+                                }
+                              }}
+                              className="purchased-button"
+                            >
+                              구매완료
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="solid"
+                              size="sm"
+                              startDecorator={<ShoppingCartIcon />}
+                              onClick={(e) => handleAddToCart(e, lesson)}
+                              className="cart-button"
+                            >
+                              장바구니
+                            </Button>
+                          )}
                         </Box>
                       </CardOverflow>
 
@@ -151,7 +188,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                             textColor="text.secondary"
                             sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
                           >
-                            {lesson.lessonViews || 99}
+                            {lesson.lessonViews}
                             <VisibilityIcon sx={{ fontSize: 26, ml: 0.5 }} />
                           </Typography>
                         </CardContent>
@@ -168,7 +205,12 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
       </Container>
 
       {selectedVideos && (
-        <VideoModal open={modalOpen} onClose={handleCloseModal} videoLinks={selectedVideos} />
+        <VideoModal 
+          open={modalOpen} 
+          onClose={handleCloseModal} 
+          videoLinks={selectedVideos} 
+          lessonId={selectedLessonId || undefined}
+        />
       )}
     </div>
   );

@@ -8,18 +8,13 @@ const useBasket = () => {
 
   const onAdd = (input: CartItem) => {
     const exist = cartItems.find((item) => item._id === input._id);
-    let cartUpdate: CartItem[];
-
+    
+    // 이미 있는 강의는 추가하지 않음 (한 번에 하나씩만 주문)
     if (exist) {
-      cartUpdate = cartItems.map((item) =>
-        item._id === input._id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-    } else {
-      cartUpdate = [...cartItems, { ...input, quantity: 1 }];
+      return; // 이미 장바구니에 있으면 추가하지 않음
     }
-
+    
+    const cartUpdate = [...cartItems, { ...input, quantity: 1 }];
     setCartItems(cartUpdate);
     localStorage.setItem("cartData", JSON.stringify(cartUpdate));
   };
