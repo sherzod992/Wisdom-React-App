@@ -149,14 +149,14 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                   onClick={() => setPriceOrder("asc")}
                   fullWidth
                 >
-                  Price ↑
+                  Price ↓
                 </Button>
                 <Button
                   variant={priceOrder === "desc" ? "contained" : "outlined"}
                   onClick={() => setPriceOrder("desc")}
                   fullWidth
                 >
-                  Price ↓
+                  Price ↑
                 </Button>
                 <Button
                   variant={!priceOrder ? "contained" : "outlined"}
