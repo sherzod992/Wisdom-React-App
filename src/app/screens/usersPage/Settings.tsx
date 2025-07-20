@@ -65,14 +65,20 @@ export function Settings() {
 
       // UpdateMember ga formData ni uzatishni unutmaymiz
       console.log("Calling updateMember...");
+      
       const updatedMember = await memberService.updateMember(formData);
       console.log("Update successful, received:", updatedMember);
+      console.log("Updated member type:", typeof updatedMember);
+      console.log("Updated member keys:", updatedMember ? Object.keys(updatedMember) : []);
 
       // 업데이트된 멤버 정보가 유효한지 확인
       if (!updatedMember || !updatedMember._id) {
+        console.error("Invalid member data received:", updatedMember);
         throw new Error("서버에서 유효하지 않은 멤버 정보를 받았습니다.");
       }
-
+      
+      console.log("Member validation passed, proceeding with state update...");
+      
       // Global authMember 업데이트 (localStorage도 자동으로 동기화됨)
       if (setAuthMember) {
         setAuthMember(updatedMember);

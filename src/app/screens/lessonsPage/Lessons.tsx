@@ -117,11 +117,11 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
 
     return (
       <div className="popular-dishes-frame">
-        <Container>
+        <Container maxWidth="xl">
           <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
             {/* 왼쪽 필터 패널 */}
-            <Box sx={{ minWidth: 220 }}>
-              <Box className="category-title" sx={{ mb: 2 }}>
+            <Box className="lessons-filter-panel">
+              <Box className="category-title">
                 Popular Lessons
               </Box>
 
@@ -180,13 +180,13 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
             </Box>
 
             {/* 오른쪽 강의 목록 */}
-            <Stack className="cards-frame" spacing={2} sx={{ flexGrow: 1 }}>
+            <Box className="lessons-cards-container">
               {loading ? (
-                <Box sx={{ textAlign: "center", py: 4 }}>
+                <Box className="lessons-loading">
                   <Typography>강의를 불러오는 중...</Typography>
                 </Box>
               ) : filteredLessons.length !== 0 ? (
-                <Stack direction="row" flexWrap="wrap" gap={3}>
+                <Box className="lessons-cards-frame">
                   {filteredLessons.map((lesson: Lesson) => {
                     const imagePath = lesson.lessonImages?.[0]
                       ? `${serverApi}/${lesson.lessonImages[0]}`
@@ -293,11 +293,11 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                       </CssVarsProvider>
                     );
                   })}
-                </Stack>
+                </Box>
               ) : (
-                <Box className="no-data">강의가 없습니다!</Box>
+                <Box className="lessons-no-data">강의가 없습니다!</Box>
               )}
-            </Stack>
+            </Box>
           </Box>
         </Container>
 

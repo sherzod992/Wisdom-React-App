@@ -31,9 +31,16 @@ export default function PausedOrders({ orders, onPayment, onCancel }: PausedOrde
 
     const handlePayment = async (orderItems: OrderItem[]) => {
         try {
+            console.log("PausedOrders: Starting payment for", orderItems.length, "items");
             onPayment(orderItems);
-            await sweetTopSuccessAlert("결제가 완료되었습니다!", 2000);
+            
+            // 결제 처리 완료 후 약간의 지연
+            setTimeout(async () => {
+                await sweetTopSuccessAlert("결제가 완료되었습니다!", 2000);
+                console.log("PausedOrders: Payment completed successfully");
+            }, 200);
         } catch (error) {
+            console.error("PausedOrders: Payment failed", error);
             sweetErrorHandling(error);
         }
     };

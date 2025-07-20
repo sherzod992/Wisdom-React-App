@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Container, Stack } from "@mui/material";
 import Card from '@mui/joy/Card';
@@ -9,8 +9,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { AspectRatio, CardOverflow, Divider, Button, Box } from "@mui/joy";
 
-
-
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import { retriverNewLessons } from "./selector.ts";
@@ -20,6 +18,7 @@ import { serverApi } from "../../../lib/types/config.ts";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
 import useBasket from "../../../hooks/useBasket.ts";
 import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
+import VideoModal from "./VideoModal.tsx";
 
 const newLessonsRetriever = createSelector (
     retriverNewLessons, 
@@ -33,6 +32,26 @@ export default function NewLessons({ onAdd }: NewLessonsProps) {
     const {newLessons}= useSelector(newLessonsRetriever)
     const { cartItems } = useBasket();
     const { isPurchased } = usePurchasedLessons();
+    
+    // 안전한 기본값 설정
+    const safeLessons = newLessons || [];
+    
+    // 동영상 모달 상태
+    const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
+    const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleOpenModal = (lessonVideo: string[], lessonId: string) => {
+      setSelectedVideos(lessonVideo);
+      setSelectedLessonId(lessonId);
+      setModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+      setSelectedVideos(null);
+      setSelectedLessonId(null);
+      setModalOpen(false);
+    };
 
     const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
       e.stopPropagation(); // 카드 클릭 이벤트 방지
@@ -58,25 +77,30 @@ export default function NewLessons({ onAdd }: NewLessonsProps) {
 
 return (
     <div className="new-products-frame">
-    <Container>
+    <Container maxWidth="xl">
         <Stack className="main">
-            <Box className = "category-title">새로운 강의</Box>
-            <Stack className="cards-frame">
+            <Box className="category-title">새로운 강의</Box>
+            <Box className="cards-frame">
                 <CssVarsProvider>
-                    {newLessons.length !== 0 ? (
-
-                        newLessons.map((lesson:Lesson) => {
+                    {safeLessons.length !== 0 ? (
+                        safeLessons.map((lesson:Lesson) => {
                             const imagePath =
                             lesson.lessonImages?.[0]
                               ? `${serverApi}/${lesson.lessonImages[0]}`
                               : "/default.jpg"; // fallback image  
                                       
                             return(
-                                <Card key={lesson._id} variant="outlined" className = "card" sx={{ position: "relative" }}>
+                                <Card 
+                                  key={lesson._id} 
+                                  variant="outlined" 
+                                  className="card" 
+                                  sx={{ position: "relative", cursor: "pointer" }}
+                                  onClick={() => handleOpenModal(lesson.lessonVideo || [], lesson._id)}
+                                >
                                 <CardOverflow>
-                                <div className="product-sale">인기 많은 강의</div>
+                                <div className="product-sale">새로운 강의</div>
                                 <AspectRatio ratio="1">
-                                <img src={imagePath} alt="" />
+                                <img src={imagePath} alt={lesson.lessonName || 'New Lesson'} />
                                 </AspectRatio>
                                 {/* 장바구니 버튼 또는 구매 완료 표시 */}
                                 <Box
@@ -118,18 +142,18 @@ return (
                                   )}
                                 </Box>
                                 </CardOverflow>
-                                <CardOverflow variant="soft" className = "product-detail" >
+                                <CardOverflow variant="soft" className="product-detail" >
                                 <Stack className="info">
                                 <Stack flexDirection={"row"}>
-                                    <Typography className = "title">
-                                        {lesson.lessonName}
+                                    <Typography className="title">
+                                        {lesson.lessonName || 'Untitled'}
                                     </Typography>
                                     <Divider sx={{ width:'2px', height:"24px", bg: "#d9d9d9"}}/>
-                                    <Typography className = {"price"}>{lesson.lessonPrice}</Typography>
+                                    <Typography className="price">${lesson.lessonPrice || 0}</Typography>
                                 </Stack>
                                 <Stack>
-                                    <Typography className = "views">
-                                        {lesson.lessonViews}
+                                    <Typography className="views">
+                                        {lesson.lessonViews || 0}
                                         <VisibilityIcon sx={{fontSize:20, marginLeft : "5px"}}/>
                                     </Typography>
                                 </Stack>
@@ -139,13 +163,23 @@ return (
                         );
                     })
                       )   : (
-<Box className = "no-data"> New products are not available! </Box>
+<Box className="no-data"> New products are not available! </Box>
                         )}
             
                 </CssVarsProvider>
-            </Stack>
+            </Box>
         </Stack>
     </Container>
+    
+    {/* 동영상 모달 */}
+    {selectedVideos && (
+      <VideoModal 
+        open={modalOpen} 
+        onClose={handleCloseModal} 
+        videoLinks={selectedVideos} 
+        lessonId={selectedLessonId || undefined}
+      />
+    )}
 </div>
 );
 }

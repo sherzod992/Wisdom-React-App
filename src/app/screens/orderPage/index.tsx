@@ -21,7 +21,7 @@ interface OrderItem extends CartItem {
 
 export default function OrdersPage() {
   const [value, setValue] = useState("1");
-  const { cartItems, onDeleteAll } = useBasket();
+  const { cartItems, onDeleteAll, onDelete } = useBasket();
   const { authMember } = useGlobals();
   
   // 로컬 스토리지에서 주문 데이터 관리
@@ -69,6 +69,9 @@ export default function OrdersPage() {
   };
 
   const handlePayment = (orderItems: OrderItem[]) => {
+    console.log("Starting payment process for items:", orderItems.map(item => item._id));
+    console.log("Current cart items before payment:", cartItems.map(item => item._id));
+    
     // paused orders에서 finished orders로 이동
     const completedOrders = orderItems.map(item => ({
       ...item,
@@ -84,6 +87,7 @@ export default function OrdersPage() {
     // finished orders에 추가
     const updatedFinishedOrders = [...finishedOrders, ...completedOrders];
 
+    // 상태 업데이트
     setPausedOrders(updatedPausedOrders);
     setFinishedOrders(updatedFinishedOrders);
 
@@ -92,19 +96,39 @@ export default function OrdersPage() {
     localStorage.setItem('finishedOrders', JSON.stringify(updatedFinishedOrders));
 
     // 장바구니에서 결제한 아이템들 제거
-    const currentCartData = localStorage.getItem('cartData');
-    if (currentCartData) {
-      const currentCart = JSON.parse(currentCartData);
-      const updatedCart = currentCart.filter((cartItem: any) => 
-        !orderItems.some(orderItem => orderItem._id === cartItem._id)
-      );
-      localStorage.setItem('cartData', JSON.stringify(updatedCart));
+    setTimeout(() => {
+      console.log("Removing items from cart...");
+      console.log("Cart items before removal:", cartItems.length);
       
-      // 전체 장바구니가 비어있으면 완전히 삭제
-      if (updatedCart.length === 0) {
-        onDeleteAll();
-      }
-    }
+      // useBasket 훅을 통해 아이템들을 하나씩 제거
+      orderItems.forEach((orderItem, index) => {
+        setTimeout(() => {
+          const cartItem = cartItems.find(cart => cart._id === orderItem._id);
+          if (cartItem) {
+            onDelete(cartItem);
+            console.log(`Removed from cart [${index + 1}/${orderItems.length}]:`, cartItem._id);
+          }
+          
+          // 마지막 아이템 제거 후 전체 정리
+          if (index === orderItems.length - 1) {
+            setTimeout(() => {
+              if (updatedPausedOrders.length === 0) {
+                console.log("All orders completed, clearing entire cart");
+                onDeleteAll();
+                console.log("Cart completely cleared");
+              }
+              
+              // 최종 상태 확인
+              setTimeout(() => {
+                const finalCartData = localStorage.getItem('cartData');
+                const finalCart = finalCartData ? JSON.parse(finalCartData) : [];
+                console.log("Final cart state:", finalCart.length, "items");
+              }, 100);
+            }, 50);
+          }
+        }, index * 50); // 각 아이템 제거 사이에 50ms 간격
+      });
+    }, 200);
   };
 
   const handleCancelOrder = (orderItems: OrderItem[]) => {

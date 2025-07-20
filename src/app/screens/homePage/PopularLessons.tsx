@@ -48,6 +48,9 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // 안전한 기본값 설정
+  const safeLessons = popularLessons || [];
+
   const handleOpenModal = (lessonVideo: string[], lessonId: string) => {
     setSelectedVideos(lessonVideo);
     setSelectedLessonId(lessonId);
@@ -84,13 +87,12 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
 
   return (
     <div className="popular-dishes-frame">
-      <Container>
+      <Container maxWidth="xl">
         <Stack className="popular-section">
-          <Box className="category-title">인기가 많은 수업 및 다음에 학습할 것 </Box>
-          <Box></Box>
-          <Stack className="cards-frame" direction="row" flexWrap="wrap" gap={3}>
-            {popularLessons.length !== 0 ? (
-              popularLessons.map((lesson: Lesson) => {
+          <Box className="category-title">인기가 많은 수업 및 다음에 학습할 것</Box>
+          <Box className="cards-frame">
+            {safeLessons.length !== 0 ? (
+              safeLessons.map((lesson: Lesson) => {
                 const imagePath = lesson.lessonImages?.[0]
                   ? `${serverApi}/${lesson.lessonImages[0]}`
                   : "/default.jpg";
@@ -99,23 +101,23 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                   <CssVarsProvider key={lesson._id}>
                     <Card
                       variant="outlined"
-                      sx={{ width: 350, cursor: "pointer", position: "relative" }}
-                      onClick={() => handleOpenModal(lesson.lessonVideo, lesson._id)}
+                      sx={{ width: 260, cursor: "pointer", position: "relative" }}
+                      onClick={() => handleOpenModal(lesson.lessonVideo || [], lesson._id)}
                     >
                       <CardOverflow>
                         <AspectRatio ratio="1">
                           <img
                             src={imagePath}
                             loading="lazy"
-                            alt={lesson.lessonTitle}
+                            alt={lesson.lessonTitle || lesson.lessonName || 'Lesson'}
                           />
                         </AspectRatio>
                         {/* 장바구니 버튼 또는 구매 완료 표시 */}
                         <Box
                           sx={{
                             position: "absolute",
-                            top: 10,
-                            right: 10,
+                            top: 8,
+                            right: 8,
                             zIndex: 1,
                           }}
                         >
@@ -129,6 +131,8 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                                 backgroundColor: "rgba(76, 175, 80, 0.2)",
                                 color: "#4caf50",
                                 cursor: "default",
+                                fontSize: "0.75rem",
+                                padding: "4px 8px",
                                 "&:hover": {
                                   backgroundColor: "rgba(76, 175, 80, 0.2)",
                                 }
@@ -143,6 +147,10 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                               size="sm"
                               startDecorator={<ShoppingCartIcon />}
                               onClick={(e) => handleAddToCart(e, lesson)}
+                              sx={{
+                                fontSize: "0.75rem",
+                                padding: "4px 8px",
+                              }}
                               className="cart-button"
                             >
                               장바구니
@@ -151,45 +159,48 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                         </Box>
                       </CardOverflow>
 
-                      <CardContent>
+                      <CardContent sx={{ padding: "12px" }}>
                         <Typography
                           sx={{
                             fontWeight: 'bold',
                             color: 'black',
-                            fontSize: '1.3rem',
+                            fontSize: '1.1rem',
                             mb: 0.5
                           }}
                         >
-                          ${lesson.lessonPrice}
+                          ${lesson.lessonPrice || 0}
                         </Typography>
-                        <Typography level="title-md">{lesson.lessonTitle}</Typography>
-                        <Typography level="body-xs" sx={{ mt: 0.5 }}>
-                          {lesson.lessonName} Lessons
+                        <Typography level="title-sm" sx={{ fontSize: "0.9rem" }}>
+                          {lesson.lessonTitle && lesson.lessonTitle.length > 30 
+                            ? lesson.lessonTitle.slice(0, 30) + "..." 
+                            : lesson.lessonTitle || lesson.lessonName || 'Untitled Lesson'}
+                        </Typography>
+                        <Typography level="body-xs" sx={{ mt: 0.5, fontSize: "0.8rem" }}>
+                          {lesson.lessonName || 'Unknown'} Lessons
                         </Typography>
                       </CardContent>
 
-                      <CardOverflow variant="soft" sx={{ bgcolor: 'background.level2' }}>
+                      <CardOverflow variant="soft" sx={{ bgcolor: 'background.level2', padding: "8px" }}>
                         <Divider inset="context" />
-                        <CardContent orientation="horizontal" sx={{ gap: 1.5 }}>
-
+                        <CardContent orientation="horizontal" sx={{ gap: 1, padding: "4px 8px" }}>
                           <Divider orientation="vertical" />
                           <Typography
                             level="body-xs"
                             textColor="text.secondary"
-                            sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
+                            sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center', fontSize: "0.75rem" }}
                           >
-                            <DescriptionOutlinedIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                            <DescriptionOutlinedIcon sx={{ fontSize: 14, mr: 0.5 }} />
                             {lesson.lessonDesc
-                              ? lesson.lessonDesc.slice(0, 30) + "..."
-                              : lesson.lessonDesc}
+                              ? lesson.lessonDesc.slice(0, 20) + "..."
+                              : "No description"}
                           </Typography>
                           <Typography
                             level="body-xs"
                             textColor="text.secondary"
-                            sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
+                            sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center', fontSize: "0.75rem" }}
                           >
-                            {lesson.lessonViews}
-                            <VisibilityIcon sx={{ fontSize: 26, ml: 0.5 }} />
+                            {lesson.lessonViews || 0}
+                            <VisibilityIcon sx={{ fontSize: 16, ml: 0.5 }} />
                           </Typography>
                         </CardContent>
                       </CardOverflow>
@@ -200,7 +211,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
             ) : (
               <Box className="no-data">Popular lessons are not available!</Box>
             )}
-          </Stack>
+          </Box>
         </Stack>
       </Container>
 

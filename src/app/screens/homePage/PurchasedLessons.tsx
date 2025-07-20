@@ -24,18 +24,21 @@ export default function PurchasedLessons() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // 안전한 기본값 설정
+  const safeLessons = popularLessons || [];
+
   useEffect(() => {
     // 구매한 강의들 필터링
     const finishedOrders = localStorage.getItem('finishedOrders');
     if (finishedOrders) {
       const orders = JSON.parse(finishedOrders);
       const purchasedIds = orders.map((order: any) => order._id);
-      const purchased = popularLessons.filter(lesson => 
+      const purchased = safeLessons.filter(lesson => 
         purchasedIds.includes(lesson._id)
       );
       setPurchasedLessons(purchased);
     }
-  }, [popularLessons]);
+  }, [safeLessons]);
 
   const handleOpenModal = (lesson: Lesson) => {
     setSelectedLesson(lesson);
@@ -53,31 +56,10 @@ export default function PurchasedLessons() {
 
   return (
     <div className="purchased-lessons-frame">
-      <Container>
+      <Container maxWidth="xl">
         <Stack className="main">
           <Box className="category-title">학습시작하기</Box>
-          <Box 
-            className="purchased-cards-frame" 
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 3,
-              overflowX: "auto",
-              overflowY: "hidden",
-              padding: "20px 0",
-              scrollBehavior: "smooth",
-              "&::-webkit-scrollbar": {
-                height: 8,
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#888",
-                borderRadius: "4px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1",
-              },
-            }}
-          >
+          <Box className="purchased-cards-frame">
             <CssVarsProvider>
               {purchasedLessons.map((lesson: Lesson) => {
                 const imagePath = lesson.lessonImages?.[0]
@@ -103,7 +85,7 @@ export default function PurchasedLessons() {
                   >
                     <CardOverflow>
                       <AspectRatio ratio="16/10">
-                        <img src={imagePath} alt={lesson.lessonName} />
+                        <img src={imagePath} alt={lesson.lessonName || 'Purchased Lesson'} />
                       </AspectRatio>
                       {/* 재생 버튼 오버레이 */}
                       <Box
@@ -126,7 +108,7 @@ export default function PurchasedLessons() {
                     
                     <Box sx={{ p: 2 }}>
                       <Typography level="title-md" sx={{ mb: 1 }}>
-                        {lesson.lessonName}
+                        {lesson.lessonName || 'Untitled Lesson'}
                       </Typography>
                       <Typography level="body-sm" sx={{ color: 'text.secondary', mb: 2 }}>
                         {lesson.lessonDesc ? lesson.lessonDesc.slice(0, 50) + "..." : "강의 설명"}
@@ -157,7 +139,7 @@ export default function PurchasedLessons() {
         <VideoModalLP
           open={modalOpen}
           onClose={handleCloseModal}
-          videoLinks={selectedLesson.lessonVideo}
+          videoLinks={selectedLesson.lessonVideo || []}
           lessonDesc={selectedLesson.lessonDesc ?? ""}
           lessonId={selectedLesson._id}
         />

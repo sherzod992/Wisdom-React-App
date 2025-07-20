@@ -121,11 +121,59 @@ class MemberService {
       const result = await axios.post(url, input, config);
       console.log("Update response status:", result.status);
       console.log("Update response data:", result.data);
+      console.log("Response data structure:", {
+        hasData: !!result.data,
+        hasMember: !!result.data?.member,
+        dataKeys: result.data ? Object.keys(result.data) : [],
+        fullResponse: result.data
+      });
       
-      const updatedMember: Member = result.data.member;
+      // 서버 응답 구조에 따라 멤버 정보 추출
+      let updatedMember: Member;
       
+      if (result.data.member) {
+        updatedMember = result.data.member;
+        console.log("Found member in result.data.member");
+      } else if (result.data.data) {
+        updatedMember = result.data.data;
+        console.log("Found member in result.data.data");
+      } else if (result.data._id) {
+        // 응답 자체가 멤버 객체인 경우
+        updatedMember = result.data;
+        console.log("Found member in result.data directly");
+      } else if (result.data.success && result.data.result) {
+        // success: true, result: member 구조
+        updatedMember = result.data.result;
+        console.log("Found member in result.data.result");
+      } else {
+        console.error("Unknown response structure:", result.data);
+        console.log("Available keys:", Object.keys(result.data));
+        
+        // 서버가 업데이트는 성공했지만 응답 구조가 다른 경우
+        // getCurrentMember를 호출하여 최신 정보 가져오기
+        console.log("Trying to fetch updated member info via getCurrentMember...");
+        try {
+          updatedMember = await this.getCurrentMember();
+          console.log("Successfully fetched updated member via getCurrentMember");
+        } catch (getCurrentError) {
+          console.error("Failed to get current member:", getCurrentError);
+          
+          // 마지막 대안: 현재 localStorage 데이터 사용
+          const currentMemberData = localStorage.getItem("memberData");
+          if (currentMemberData) {
+            updatedMember = JSON.parse(currentMemberData);
+            console.log("Using current member data as final fallback");
+          } else {
+            throw new Error("서버에서 업데이트된 멤버 정보를 받지 못했습니다.");
+          }
+        }
+      }
+      
+      console.log("Extracted member:", updatedMember);
+      
+      // 기본적인 검증만 수행
       if (!updatedMember) {
-        throw new Error("서버에서 업데이트된 멤버 정보를 받지 못했습니다.");
+        throw new Error("서버에서 유효하지 않은 멤버 정보를 받았습니다.");
       }
       
       // localStorage에도 업데이트된 멤버 정보 저장
