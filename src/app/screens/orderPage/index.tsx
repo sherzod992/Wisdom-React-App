@@ -11,6 +11,7 @@ import React from "react";
 import { CartItem } from "../../../lib/types/search.ts";
 import useBasket from "../../../hooks/useBasket.ts";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
+import { serverApi } from "../../../lib/types/config.ts";
 
 interface OrderItem extends CartItem {
   orderId?: string;
@@ -151,9 +152,13 @@ export default function OrdersPage() {
             <Box className={"member-box"}>
               <div className={"order-user-img"}>
                 <img 
-                  src={authMember?.memberImage || "/icons/default-user.svg"}
+                  src={authMember?.memberImage ? 
+                    (authMember.memberImage.startsWith('http') ? 
+                      authMember.memberImage : 
+                      `${serverApi}/${authMember.memberImage}`) : 
+                    "/icons/default-user.svg"}
                   className={"order-user-avatar"}
-                  alt=""
+                  alt="User Avatar"
                 />
                 <div className={"order-user-icon-box"}>
                   <img

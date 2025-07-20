@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, Box, Stack, Typography, Button } from "@mui/material";
 import YouTube, { YouTubePlayer } from "react-youtube";
 import LockIcon from "@mui/icons-material/Lock";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import useBasket from "../../../hooks/useBasket.ts";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
 import { serverApi } from "../../../lib/types/config.ts";
@@ -95,6 +96,30 @@ const VideoModalLP: React.FC<VideoModalProps> = ({
   useEffect(() => {
     setSelectedVideoIndex(0);
   }, [videoLinks]);
+
+  // 모달이 열릴 때 현재 조회수 가져오기
+  useEffect(() => {
+    if (open && lessonId) {
+      const getInitialViews = async () => {
+        try {
+          // 일반적인 강의 정보 가져오기 (조회수 증가 없이)
+          const response = await fetch(`${serverApi}/lessons`, {
+            method: 'GET',
+          });
+          if (response.ok) {
+            const lessons = await response.json();
+            const currentLesson = lessons.find((lesson: any) => lesson._id === lessonId);
+            if (currentLesson) {
+              setCurrentViews(currentLesson.lessonViews || 0);
+            }
+          }
+        } catch (error) {
+          console.error('초기 조회수 가져오기 실패:', error);
+        }
+      };
+      getInitialViews();
+    }
+  }, [open, lessonId]);
 
   // Video oynasi tayyor bo'lganda player instance saqlaymiz
   const onReady = (event: { target: YouTubePlayer }) => {
@@ -289,10 +314,28 @@ const VideoModalLP: React.FC<VideoModalProps> = ({
           <Typography variant="h6" mb={1}>
             Lesson Desc
           </Typography>
+          
+          {/* 조회수 표시 */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              p: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.05)",
+              borderRadius: 1,
+            }}
+          >
+            <VisibilityIcon sx={{ fontSize: 20, mr: 1, color: "#666" }} />
+            <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+              조회수: {currentViews || "0"}
+            </Typography>
+          </Box>
+          
           <Typography
             variant="body1"
             
-            sx={{ whiteSpace: "pre-line" }} // \n ishlasa ham chiroyli ko‘rinadi
+            sx={{ whiteSpace: "pre-line" }} // \n ishlasa ham chiroyli ko'rinadi
           >
             {lessonDesc || "Description mavjud emas"}
           </Typography>

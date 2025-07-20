@@ -99,7 +99,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                   <CssVarsProvider key={lesson._id}>
                     <Card
                       variant="outlined"
-                      sx={{ width: 450, cursor: "pointer", position: "relative" }}
+                      sx={{ width: 350, cursor: "pointer", position: "relative" }}
                       onClick={() => handleOpenModal(lesson.lessonVideo, lesson._id)}
                     >
                       <CardOverflow>

@@ -7,6 +7,7 @@ import { Settings } from "./Settings.tsx";
 import "../../../css/usersPage.css";
 import React from "react";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
+import { serverApi } from "../../../lib/types/config.ts";
 
 export default function UserPage() {
   const { authMember } = useGlobals();
@@ -33,8 +34,13 @@ export default function UserPage() {
               >
                 <div className={"order-user-img"}>
                   <img
-                    src={authMember?.memberImage || "/icons/default-user.svg"}
+                    src={authMember?.memberImage ? 
+                      (authMember.memberImage.startsWith('http') ? 
+                        authMember.memberImage : 
+                        `${serverApi}/${authMember.memberImage}`) : 
+                      "/icons/default-user.svg"}
                     className={"order-user-avatar"}
+                    alt="User Avatar"
                   />
                   <div className={"order-user-icon-box"}>
                     <img src={"/icons/user-badge.svg"} />
