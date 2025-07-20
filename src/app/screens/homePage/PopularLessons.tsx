@@ -4,6 +4,7 @@ import {
   Container,
   Divider,
   Stack,
+  Button,
 } from "@mui/joy";
 import {
   Card,
@@ -16,12 +17,15 @@ import {
 } from "@mui/joy";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import { retriverPopularLessons } from "./selector.ts";
 import { Lesson } from "../../../lib/types/lesson.ts";
+import { CartItem } from "../../../lib/types/search.ts";
 import { serverApi } from "../../../lib/types/config.ts";
 import VideoModal from "./VideoModal.tsx";
+import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
 
 // Redux selector
 const popularLessonsRetriever = createSelector(
@@ -29,7 +33,11 @@ const popularLessonsRetriever = createSelector(
   (popularLessons) => ({ popularLessons })
 );
 
-export default function PopularLessons() {
+interface PopularLessonsProps {
+  onAdd: (item: CartItem) => void;
+}
+
+export default function PopularLessons({ onAdd }: PopularLessonsProps) {
   const { popularLessons } = useSelector(popularLessonsRetriever);
   const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,6 +50,19 @@ export default function PopularLessons() {
   const handleCloseModal = () => {
     setSelectedVideos(null);
     setModalOpen(false);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    const cartItem: CartItem = {
+      _id: lesson._id,
+      name: lesson.lessonTitle,
+      price: lesson.lessonPrice,
+      image: lesson.lessonImages?.[0] || "",
+      quantity: 1
+    };
+    onAdd(cartItem);
+    await sweetTopSuccessAlert(`${lesson.lessonTitle}이(가) 장바구니에 추가되었습니다!`, 2000);
   };
 
   return (
@@ -61,7 +82,7 @@ export default function PopularLessons() {
                   <CssVarsProvider key={lesson._id}>
                     <Card
                       variant="outlined"
-                      sx={{ width: 450, cursor: "pointer"}}
+                      sx={{ width: 450, cursor: "pointer", position: "relative" }}
                       onClick={() => handleOpenModal(lesson.lessonVideo)}
                     >
                       <CardOverflow>
@@ -72,6 +93,25 @@ export default function PopularLessons() {
                             alt={lesson.lessonTitle}
                           />
                         </AspectRatio>
+                        {/* 장바구니 버튼 */}
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 10,
+                            right: 10,
+                            zIndex: 1,
+                          }}
+                        >
+                          <Button
+                            variant="solid"
+                            size="sm"
+                            startDecorator={<ShoppingCartIcon />}
+                            onClick={(e) => handleAddToCart(e, lesson)}
+                            className="cart-button"
+                          >
+                            장바구니
+                          </Button>
+                        </Box>
                       </CardOverflow>
 
                       <CardContent>

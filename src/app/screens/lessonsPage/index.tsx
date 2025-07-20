@@ -11,7 +11,7 @@ interface LessonPageProps {
 
 function LessonPageWrapper({ onAdd }: LessonPageProps) {
   const { productId } = useParams<{ productId: string }>();
-  return <Lessons  />;
+  return <Lessons onAdd={onAdd} />;
 }
 
 export default function LessonsPage({ onAdd }: LessonPageProps) {
@@ -22,7 +22,7 @@ export default function LessonsPage({ onAdd }: LessonPageProps) {
           <LessonPageWrapper onAdd={onAdd} />
         </Route>
         <Route path="/lessons" exact>
-          <Lessons  />
+          <Lessons onAdd={onAdd} />
         </Route>
       </Switch>
     </div>

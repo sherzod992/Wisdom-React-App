@@ -64,14 +64,53 @@ class MemberService {
   public async logout(): Promise<void> {
     try {
       const url = `${this.path}/member/logout`;
-      const result = await axios.post(url, {}, { withCredentials: true });
+      console.log("로그아웃 요청 URL:", url);
+      
+      // 타임아웃 설정 (5초)
+      const result = await axios.post(url, {}, { 
+        withCredentials: true,
+        timeout: 5000 
+      });
+      
       localStorage.removeItem("memberData");
-      console.log("logout:", result.data);
+      console.log("로그아웃 응답:", result.data);
+      console.log("memberData 로컬스토리지에서 제거됨");
+    } catch (err: any) {
+      console.error("로그아웃 서비스 오류:", err);
+      
+      // 서버 오류가 있어도 로컬 데이터는 정리
+      localStorage.removeItem("memberData");
+      
+      // 네트워크 오류인 경우 더 구체적인 메시지
+      if (err.code === 'ECONNABORTED') {
+        throw new Error('서버 응답 시간이 초과되었습니다.');
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        throw new Error('서버에 연결할 수 없습니다.');
+      } else {
+        throw err;
+      }
+    }
+  }
+  public async updateMember(input: FormData | Partial<Member>): Promise<Member> {
+    try {
+      const url = `${this.path}/member/update`;
+      const config = {
+        headers: {
+          "Content-Type": input instanceof FormData ? "multipart/form-data" : "application/json",
+        },
+        withCredentials: true,
+      };
+      const result = await axios.post(url, input, config);
+      return result.data.member;
     } catch (err) {
-      console.log("logout error:", err);
+      console.log("updateMember error:", err);
       throw err;
     }
   }
-}
+  
+  
+  }
+  
+
 
 export default MemberService;

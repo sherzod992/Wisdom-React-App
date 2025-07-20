@@ -19,6 +19,7 @@ import {
 } from "./slice.ts";
 
 import { Lesson } from "../../../lib/types/lesson.ts";
+import { CartItem } from "../../../lib/types/search.ts";
 import { LessonCollection } from "../../../lib/enums/lesson.enum.ts";
 import LessonService from "../../service/LessonService.ts";
 import { Member } from "../../../lib/types/member.ts";
@@ -32,7 +33,11 @@ const actionDispatch = (dispatch: Dispatch) => ({
   setTopUsers: (data: Member[]) => dispatch(setTopUsers(data)),
 });
 
-export default function HomePage() {
+interface HomePageProps {
+  onAdd: (item: CartItem) => void;
+}
+
+export default function HomePage({ onAdd }: HomePageProps) {
   const dispatch = useDispatch();
   const { setPopularLessons, setNewLessons, setTopUsers } = actionDispatch(dispatch);
 
@@ -69,8 +74,8 @@ export default function HomePage() {
   return (
     <div className="homepage">
       <Welcome />
-      <PopularLessons />
-      <NewLessons />
+      <PopularLessons onAdd={onAdd} />
+      <NewLessons onAdd={onAdd} />
       <ActiveUsers />
       <Events />
     </div>

@@ -1,26 +1,27 @@
 export const faq = [
 	{
-		question: 'How to make order?',
-		answer: 'You should choose products and make an order via basket!',
+	  question: '강의를 어떻게 수강하나요?',
+	  answer: '관심 있는 강의를 선택하여 장바구니에 담거나 바로 결제하시면, 강의 영상을 시청할 수 있습니다.',
 	},
 	{
-		question: 'How long does delivery takes?',
-		answer: 'It depends on your location. The max delivery time is 1 hour!',
+	  question: '강의 수강 기간은 어떻게 되나요?',
+	  answer: '결제 후 일정 기간 동안 강의를 무제한으로 수강하실 수 있습니다. 자세한 기간은 각 강의별 안내를 참고해주세요.',
 	},
 	{
-		question: 'Is our details secure in this platform?',
-		answer: 'Of course, we take full responsibility for your provided user details!',
+	  question: '개인 정보는 안전하게 보호되나요?',
+	  answer: '네, Wisdom 플랫폼은 사용자의 개인정보 보호를 최우선으로 하며, 안전한 보안 시스템을 갖추고 있습니다.',
 	},
 	{
-		question: 'I am blocked, what should I do?',
-		answer: 'There is a reason for your block, please contact to us!',
+	  question: '회원 계정이 잠겼습니다. 어떻게 해야 하나요?',
+	  answer: '계정 잠금 사유가 있을 수 있으니 고객센터에 문의해 주시면 안내해 드리겠습니다.',
 	},
 	{
-		question: 'How can I cancel order?',
-		answer: 'You can cancel your order any time easily, just go to your orders page!',
+	  question: '수강 중인 강의를 취소하거나 환불할 수 있나요?',
+	  answer: '수강 중인 강의는 플랫폼 정책에 따라 환불 및 취소가 가능하며, 자세한 내용은 고객센터에 문의 바랍니다.',
 	},
 	{
-		question: 'Who developed this platform?',
-		answer: 'ITC Global developers developed this platform!',
+	  question: '이 플랫폼은 누가 개발하였나요?',
+	  answer: 'Wisdom 플랫폼은 ITC Global 개발팀에서 학습자 맞춤형 교육을 위해 개발하였습니다.',
 	},
-];
+  ];
+  

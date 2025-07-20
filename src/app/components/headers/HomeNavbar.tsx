@@ -1,11 +1,11 @@
-import React, { use } from "react";
+import React from "react";
 import { Box, Button, Container, ListItemIcon, Menu, MenuItem, Stack } from "@mui/material";
 import {NavLink} from "react-router-dom"
 import Basket from "../headers/Basket.tsx";
-import { useEffect,useState } from "react";
 import { CartItem } from "../../../lib/types/search.ts";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
 import { Logout } from "@mui/icons-material";
+import { serverApi } from "../../../lib/types/config.ts";
 
 
 
@@ -75,16 +75,26 @@ export default function HomeNavbar(props:HomeNavbarProps) {
                         </Box>
                     ) : (
                         <img className="user-avatar"
-                        src={authMember?.memberImage?`${authMember?.memberImage}`:"/icons/default-user.svg"}
-                        aria-haspopup = {"true"}
-                        onClick={handleLogOutClick} />
+                        src={authMember?.memberImage ? 
+                            (authMember.memberImage.startsWith('http') ? 
+                                authMember.memberImage : 
+                                `${serverApi}/${authMember.memberImage}`) : 
+                            "/icons/default-user.svg"}
+                        alt="User Avatar"
+                        role="button"
+                        tabIndex={0}
+                        onClick={handleLogOutClick} 
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleLogOutClick(e as unknown as React.MouseEvent<HTMLElement>);
+                            }
+                        }} />
                     )}
                     <Menu
                         anchorEl={anchorEl}
                         open ={Boolean(anchorEl)}
                         id="account-menu"
                         onClose={handleCloseLogout}
-                        onClick={handleCloseLogout}
                         PaperProps={{
                             elevation: 0,
                             sx: {

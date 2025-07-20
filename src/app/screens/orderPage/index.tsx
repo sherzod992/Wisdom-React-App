@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from "react";
+import { useState, SyntheticEvent, useEffect } from "react";
 import { Container, Stack, Box } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -9,14 +9,101 @@ import ProcessOrders from "./ProcessOrders.tsx";
 import FinishedOrders from "./FinishedOrders.tsx";
 import "../../../css/orders.css"
 import React from "react";
+import { CartItem } from "../../../lib/types/search.ts";
+import useBasket from "../../../hooks/useBasket.ts";
+import { useGlobals } from "../../../hooks/useGlobals.ts";
 
+interface OrderItem extends CartItem {
+  orderId?: string;
+  status: 'paused' | 'finished';
+  orderDate: Date;
+}
 
 export default function OrdersPage() {
   const [value, setValue] = useState("1");
+  const { cartItems, onDeleteAll } = useBasket();
+  const { authMember } = useGlobals();
+  
+  // 로컬 스토리지에서 주문 데이터 관리
+  const [pausedOrders, setPausedOrders] = useState<OrderItem[]>([]);
+  const [finishedOrders, setFinishedOrders] = useState<OrderItem[]>([]);
+
+  useEffect(() => {
+    // 로컬 스토리지에서 기존 주문 데이터 로드
+    const pausedOrdersData = localStorage.getItem('pausedOrders');
+    const finishedOrdersData = localStorage.getItem('finishedOrders');
+    
+    if (pausedOrdersData) {
+      setPausedOrders(JSON.parse(pausedOrdersData));
+    }
+    if (finishedOrdersData) {
+      setFinishedOrders(JSON.parse(finishedOrdersData));
+    }
+  }, []);
+
+  useEffect(() => {
+    // 장바구니 아이템들을 paused orders로 추가 (중복 방지)
+    if (cartItems.length > 0) {
+      const existingPausedIds = pausedOrders.map(order => order._id);
+      const newItems = cartItems.filter(item => !existingPausedIds.includes(item._id));
+      
+      if (newItems.length > 0) {
+        // 모든 새 아이템에 같은 orderId 할당 (하나의 주문으로 그룹화)
+        const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newPausedOrders = newItems.map(item => ({
+          ...item,
+          orderId,
+          status: 'paused' as const,
+          orderDate: new Date()
+        }));
+        
+        const updatedPausedOrders = [...pausedOrders, ...newPausedOrders];
+        setPausedOrders(updatedPausedOrders);
+        localStorage.setItem('pausedOrders', JSON.stringify(updatedPausedOrders));
+      }
+    }
+  }, [cartItems]);
 
   const handleChange = (e: SyntheticEvent, newValue: string) => {
-    setValue(newValue)
-  }
+    setValue(newValue);
+  };
+
+  const handlePayment = (orderItems: OrderItem[]) => {
+    // paused orders에서 finished orders로 이동
+    const completedOrders = orderItems.map(item => ({
+      ...item,
+      status: 'finished' as const,
+      orderDate: new Date()
+    }));
+
+    // paused orders에서 제거
+    const updatedPausedOrders = pausedOrders.filter(
+      pausedItem => !orderItems.some(item => item._id === pausedItem._id)
+    );
+
+    // finished orders에 추가
+    const updatedFinishedOrders = [...finishedOrders, ...completedOrders];
+
+    setPausedOrders(updatedPausedOrders);
+    setFinishedOrders(updatedFinishedOrders);
+
+    // 로컬 스토리지 업데이트
+    localStorage.setItem('pausedOrders', JSON.stringify(updatedPausedOrders));
+    localStorage.setItem('finishedOrders', JSON.stringify(updatedFinishedOrders));
+
+    // 장바구니에서도 제거
+    onDeleteAll();
+  };
+
+  const handleCancelOrder = (orderItems: OrderItem[]) => {
+    // paused orders에서 제거
+    const updatedPausedOrders = pausedOrders.filter(
+      pausedItem => !orderItems.some(item => item._id === pausedItem._id)
+    );
+
+    setPausedOrders(updatedPausedOrders);
+    localStorage.setItem('pausedOrders', JSON.stringify(updatedPausedOrders));
+  };
 
   return (
     <div className={"order-page"}>
@@ -38,9 +125,13 @@ export default function OrdersPage() {
               </Box>
             </Box>
             <Stack className={"order-main-content"}>
-              <PausedOrders />
+              <PausedOrders 
+                orders={pausedOrders} 
+                onPayment={handlePayment}
+                onCancel={handleCancelOrder}
+              />
               <ProcessOrders />
-              <FinishedOrders />
+              <FinishedOrders orders={finishedOrders} />
             </Stack>
           </TabContext>
         </Stack>
@@ -51,7 +142,7 @@ export default function OrdersPage() {
             <Box className={"member-box"}>
               <div className={"order-user-img"}>
                 <img 
-                  src={"/icons/default-user.svg"}
+                  src={authMember?.memberImage || "/icons/default-user.svg"}
                   className={"order-user-avatar"}
                   alt=""
                 />
@@ -64,10 +155,10 @@ export default function OrdersPage() {
                 </div>
               </div>
               <span className={"order-user-name"}>
-                김세리
+                {authMember?.memberNick || "Guest"}
               </span>
               <span className={"order-user-prof"}>
-                User
+                {authMember?.memberStatus || "User"}
               </span>
             </Box>
             <Box className={"liner"}></Box>
@@ -76,7 +167,7 @@ export default function OrdersPage() {
                 <LocationOnIcon />
               </div>
               <div className={"spec-address-txt"}>
-                충청남도 아산시 탕정면 선문로 221번길 
+                {authMember?.memberAddress || "주소가 등록되지 않았습니다"}
               </div>
             </Box>
           </Box>
@@ -110,7 +201,7 @@ export default function OrdersPage() {
             <input
               type={"text"}
               name={"cardCreator"}
-              placeholder={"김세리"}
+              placeholder={authMember?.memberNick || "이름을 입력하세요"}
               className={"card-input"}
             />
             <div className={"cards-box"}>

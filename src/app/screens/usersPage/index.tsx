@@ -6,8 +6,11 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Settings } from "./Settings.tsx";
 import "../../../css/usersPage.css";
 import React from "react";
+import { useGlobals } from "../../../hooks/useGlobals.ts";
 
 export default function UserPage() {
+  const { authMember } = useGlobals();
+
   return (
     <div className={"user-page"}>
       <Container>
@@ -30,16 +33,22 @@ export default function UserPage() {
               >
                 <div className={"order-user-img"}>
                   <img
-                    src={"/icons/default-user.svg"}
+                    src={authMember?.memberImage || "/icons/default-user.svg"}
                     className={"order-user-avatar"}
                   />
                   <div className={"order-user-icon-box"}>
                     <img src={"/icons/user-badge.svg"} />
                   </div>
                 </div>
-                <span className={"order-user-name"}>Martin</span>
-                <span className={"order-user-prof"}>User</span>
-                <span className={"order-user-prof"}>No address</span>
+                <span className={"order-user-name"}>
+                  {authMember?.memberNick || "Guest"}
+                </span>
+                <span className={"order-user-prof"}>
+                  {authMember?.memberStatus || "User"}
+                </span>
+                <span className={"order-user-prof"}>
+                  {authMember?.memberAddress || "No address"}
+                </span>
               </Box>
               <Box className={"user-media-box"}>
                 <FacebookIcon />
@@ -47,7 +56,9 @@ export default function UserPage() {
                 <TelegramIcon />
                 <YouTubeIcon />
               </Box>
-              <p className={"user-desc"}>No description</p>
+              <p className={"user-desc"}>
+                {authMember?.memberDesk || "No description"}
+              </p>
             </Box>
           </Stack>
         </Stack>
