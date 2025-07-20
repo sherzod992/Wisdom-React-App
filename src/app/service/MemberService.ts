@@ -38,7 +38,13 @@ class MemberService {
       const url = `${this.path}/member/signup`;
       const result = await axios.post(url, input, { withCredentials: true });
       const member: Member = result.data.member;
-      localStorage.setItem("memberData", JSON.stringify(member));
+      try {
+        if (member && typeof member === 'object') {
+          localStorage.setItem("memberData", JSON.stringify(member));
+        }
+      } catch (error) {
+        console.error("Error saving signup member to localStorage:", error);
+      }
       console.log("signup:", member);
       return member;
     } catch (err) {
@@ -52,7 +58,13 @@ class MemberService {
       const url = `${this.path}/member/login`;
       const result = await axios.post(url, input, { withCredentials: true });
       const member: Member = result.data.member;
-      localStorage.setItem("memberData", JSON.stringify(member));
+      try {
+        if (member && typeof member === 'object') {
+          localStorage.setItem("memberData", JSON.stringify(member));
+        }
+      } catch (error) {
+        console.error("Error saving login member to localStorage:", error);
+      }
       console.log("login:", member);
       return member;
     } catch (err) {
@@ -94,16 +106,55 @@ class MemberService {
   public async updateMember(input: FormData | Partial<Member>): Promise<Member> {
     try {
       const url = `${this.path}/member/update`;
+      console.log("UpdateMember URL:", url);
+      console.log("UpdateMember input type:", input instanceof FormData ? "FormData" : "JSON");
+      
       const config = {
         headers: {
           "Content-Type": input instanceof FormData ? "multipart/form-data" : "application/json",
         },
         withCredentials: true,
+        timeout: 30000, // 30초 타임아웃
       };
+      
+      console.log("Sending update request...");
       const result = await axios.post(url, input, config);
-      return result.data.member;
-    } catch (err) {
-      console.log("updateMember error:", err);
+      console.log("Update response status:", result.status);
+      console.log("Update response data:", result.data);
+      
+      const updatedMember: Member = result.data.member;
+      
+      if (!updatedMember) {
+        throw new Error("서버에서 업데이트된 멤버 정보를 받지 못했습니다.");
+      }
+      
+      // localStorage에도 업데이트된 멤버 정보 저장
+      try {
+        if (updatedMember && typeof updatedMember === 'object') {
+          localStorage.setItem("memberData", JSON.stringify(updatedMember));
+          console.log("Updated member saved to localStorage");
+        }
+      } catch (error) {
+        console.error("Error saving updated member to localStorage:", error);
+      }
+      console.log("updateMember successful:", updatedMember);
+      
+      return updatedMember;
+    } catch (err: any) {
+      console.error("updateMember detailed error:", {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        config: err.config
+      });
+      
+      // 401 오류의 경우 localStorage 정리
+      if (err.response?.status === 401) {
+        console.log("401 error detected, clearing localStorage");
+        localStorage.removeItem("memberData");
+      }
+      
       throw err;
     }
   }

@@ -39,22 +39,50 @@ export function Settings() {
 
   const handleSubmit = async () => {
     try {
+      console.log("Starting profile update...");
+      console.log("Current authMember:", authMember);
+      
       const formData = new FormData();
-      formData.append("memberNick", memberNick);
-      formData.append("memberPhone", memberPhone);
-      formData.append("memberAddress", memberAddress);
-      formData.append("memberDesc", memberDesc);
+      formData.append("memberNick", memberNick || authMember?.memberNick || "");
+      formData.append("memberPhone", memberPhone || authMember?.memberPhone || "");
+      formData.append("memberAddress", memberAddress || authMember?.memberAddress || "");
+      formData.append("memberDesc", memberDesc || authMember?.memberDesk || "");
+      
+      // 멤버 ID 추가 (서버에서 필요할 수 있음)
+      if (authMember?._id) {
+        formData.append("memberId", authMember._id);
+      }
 
       if (file) {
+        console.log("File to upload:", file.name, file.size);
         formData.append("memberImage", file);
       }
 
-      // UpdateMember ga formData ni uzatishni unutmaymiz
-      const updatedMember = await memberService.updateMember(formData);
+      // FormData 내용 로깅
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData ${key}:`, value);
+      }
 
-      // Global authMember ni yangilash
+      // UpdateMember ga formData ni uzatishni unutmaymiz
+      console.log("Calling updateMember...");
+      const updatedMember = await memberService.updateMember(formData);
+      console.log("Update successful, received:", updatedMember);
+
+      // 업데이트된 멤버 정보가 유효한지 확인
+      if (!updatedMember || !updatedMember._id) {
+        throw new Error("서버에서 유효하지 않은 멤버 정보를 받았습니다.");
+      }
+
+      // Global authMember 업데이트 (localStorage도 자동으로 동기화됨)
       if (setAuthMember) {
         setAuthMember(updatedMember);
+        console.log("AuthMember updated in context");
+        
+        // 업데이트 후 실제 상태 확인
+        setTimeout(() => {
+          const currentMember = localStorage.getItem("memberData");
+          console.log("Final localStorage state:", currentMember);
+        }, 100);
       }
 
       // 업로드 후 상태 초기화
@@ -62,9 +90,24 @@ export function Settings() {
       setPreviewImage(null);
 
       alert("Profile updated successfully!");
-    } catch (error) {
-      console.error("Update failed:", error);
-      alert("Failed to update profile.");
+    } catch (error: any) {
+      console.error("Update failed - Full error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      // 401 Unauthorized 오류인 경우 (인증 만료)
+      if (error.response?.status === 401) {
+        console.log("Authentication expired, logging out...");
+        alert("인증이 만료되었습니다. 다시 로그인해주세요.");
+        if (setAuthMember) {
+          setAuthMember(null);
+        }
+        // 로그인 페이지로 리디렉션하거나 추가 처리
+        return;
+      }
+      
+      // 기타 오류
+      alert(`Failed to update profile: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -82,8 +125,8 @@ export function Settings() {
           alt="User avatar"
         />
         <div className={"media-change-box"}>
-          <span>{file ? "새 이미지 선택됨" : "Upload image"}</span>
-          <p>{file ? `선택된 파일: ${file.name}` : "JPG, JPEG, PNG formats only!"}</p>
+          <span>{file ? "새 이미지 선택됨" : "사진 업로드"}</span>
+          <p>{file ? `선택된 파일: ${file.name}` : "JPG, JPEG, PNG 파일만 업로드 가능합니다!"}</p>
           {file && (
             <p style={{ color: 'green', fontSize: '12px' }}>
               기존 이미지가 이 이미지로 교체됩니다
@@ -92,7 +135,7 @@ export function Settings() {
           <div className={"up-del-box"}>
             <Button component="label" variant={file ? "contained" : "outlined"}>
               <CloudDownloadIcon />
-              {file ? "다른 이미지 선택" : "이미지 선택"}
+              {file ? "" : ""}
               <input type="file" hidden onChange={handleFileChange} accept="image/*" />
             </Button>
             {file && (
