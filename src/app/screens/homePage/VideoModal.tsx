@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Stack, Typography, Button } from "@mui/material";
 import YouTube from "react-youtube";
 import LockIcon from "@mui/icons-material/Lock";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import useBasket from "../../../hooks/useBasket.ts";
 import { useGlobals } from "../../../hooks/useGlobals.ts";
 import { serverApi } from "../../../lib/types/config.ts";
@@ -23,7 +23,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ open, onClose, videoLinks, less
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
   const { cartItems } = useBasket();
   const { authMember } = useGlobals();
-  const [currentViews, setCurrentViews] = useState<number | undefined>(undefined);
+
 
   // 강의가 구매되었는지 확인하는 함수
   const isPurchased = () => {
@@ -42,46 +42,12 @@ const VideoModal: React.FC<VideoModalProps> = ({ open, onClose, videoLinks, less
     return index === 0 || isPurchased(); // 첫 번째 비디오 또는 구매한 강의
   };
 
-  // 조회수 증가 함수
-  const handleViewIncrement = async () => {
-    if (!lessonId || !authMember?._id) return;
 
-    // localStorage에서 이미 조회수가 증가했는지 확인
-    const viewKey = `lesson_viewed_${lessonId}_${authMember._id}`;
-    const hasViewed = localStorage.getItem(viewKey);
-
-    if (!hasViewed) {
-      try {
-        const response = await fetch(`${serverApi}/lessons/${lessonId}?memberId=${authMember._id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCurrentViews(data.lessonViews);
-          // 조회수 증가 완료 기록
-          localStorage.setItem(viewKey, 'true');
-          console.log(`조회수가 증가되었습니다: ${data.lessonViews}`);
-        }
-      } catch (error) {
-        console.error('조회수 증가 실패:', error);
-      }
-    }
-  };
 
   // 동영상 썸네일 클릭 핸들러
   const handleVideoClick = (index: number) => {
     if (!isVideoPlayable(index)) return;
-    
     setSelectedVideoIndex(index);
-    
-    // 처음 동영상을 클릭할 때만 조회수 증가
-    if (selectedVideoIndex !== index || selectedVideoIndex === 0) {
-      handleViewIncrement();
-    }
   };
 
   // Videolar o'zganda tanlangan videoni birinchi videoga o'rnatamiz
@@ -89,29 +55,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ open, onClose, videoLinks, less
     setSelectedVideoIndex(0);
   }, [videoLinks]);
 
-  // 모달이 열릴 때 현재 조회수 가져오기
-  useEffect(() => {
-    if (open && lessonId) {
-      const getInitialViews = async () => {
-        try {
-          // 일반적인 강의 정보 가져오기 (조회수 증가 없이)
-          const response = await fetch(`${serverApi}/lessons`, {
-            method: 'GET',
-          });
-          if (response.ok) {
-            const lessons = await response.json();
-            const currentLesson = lessons.find((lesson: any) => lesson._id === lessonId);
-            if (currentLesson) {
-              setCurrentViews(currentLesson.lessonViews || 0);
-            }
-          }
-        } catch (error) {
-          console.error('초기 조회수 가져오기 실패:', error);
-        }
-      };
-      getInitialViews();
-    }
-  }, [open, lessonId]);
+
 
   const selectedVideoId = getYouTubeVideoId(videoLinks[selectedVideoIndex]);
 
@@ -272,23 +216,7 @@ const VideoModal: React.FC<VideoModalProps> = ({ open, onClose, videoLinks, less
           })}
         </Stack>
 
-        {/* 조회수 표시 */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            mt: 2,
-            p: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.05)",
-            borderRadius: 1,
-          }}
-        >
-          <VisibilityIcon sx={{ fontSize: 20, mr: 1, color: "#666" }} />
-          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-            조회수: {currentViews || "0"}
-          </Typography>
-        </Box>
+
 
         {/* Yopish tugmasi */}
         <Box sx={{ mt: 2, textAlign: "right" }}>

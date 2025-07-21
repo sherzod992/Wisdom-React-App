@@ -47,9 +47,56 @@ class MemberService {
       }
       console.log("signup:", member);
       return member;
-    } catch (err) {
+    } catch (err: any) {
       console.log("signup error:", err);
-      throw err;
+      
+      // HTTP 상태 코드에 따른 구체적인 에러 메시지 설정
+      if (err.response) {
+        const status = err.response.status;
+        const serverMessage = err.response.data?.message || '';
+        
+        switch (status) {
+          case 400:
+            // 잘못된 요청 (중복 사용자, 유효하지 않은 입력 등)
+            if (serverMessage.includes('already exists') || 
+                serverMessage.includes('duplicate') ||
+                serverMessage.includes('이미 존재')) {
+              const error = new Error("이미 존재하는 아이디입니다.");
+              error.name = 'SIGNUP_DUPLICATE_USER';
+              throw error;
+            } else {
+              const error = new Error("입력 정보를 확인해주세요.");
+              error.name = 'SIGNUP_INVALID_INPUT';
+              throw error;
+            }
+          case 409:
+            // 중복 리소스
+            const error409 = new Error("이미 존재하는 아이디입니다.");
+            error409.name = 'SIGNUP_CONFLICT';
+            throw error409;
+          case 500:
+          case 502:
+          case 503:
+            // 서버 오류
+            const error5xx = new Error("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            error5xx.name = 'SIGNUP_SERVER_ERROR';
+            throw error5xx;
+          default:
+            const errorDefault = new Error("회원가입에 실패했습니다. 다시 시도해주세요.");
+            errorDefault.name = 'SIGNUP_UNKNOWN_ERROR';
+            throw errorDefault;
+        }
+      } else if (err.request) {
+        // 네트워크 오류
+        const networkError = new Error("네트워크 연결을 확인해주세요.");
+        networkError.name = 'SIGNUP_NETWORK_ERROR';
+        throw networkError;
+      } else {
+        // 기타 오류
+        const otherError = new Error("회원가입에 실패했습니다. 다시 시도해주세요.");
+        otherError.name = 'SIGNUP_OTHER_ERROR';
+        throw otherError;
+      }
     }
   }
 
@@ -67,9 +114,62 @@ class MemberService {
       }
       console.log("login:", member);
       return member;
-    } catch (err) {
+    } catch (err: any) {
       console.log("login error:", err);
-      throw err;
+      
+      // HTTP 상태 코드에 따른 구체적인 에러 메시지 설정
+      if (err.response) {
+        const status = err.response.status;
+        const serverMessage = err.response.data?.message || '';
+        
+        switch (status) {
+          case 400:
+            // 잘못된 요청 (아이디/비밀번호 오류)
+            if (serverMessage.includes('Please try again') || 
+                serverMessage.includes('Invalid credentials') ||
+                serverMessage.includes('Wrong password') ||
+                serverMessage.includes('User not found')) {
+              const error = new Error("아이디 또는 비밀번호가 잘못되었습니다.");
+              error.name = 'LOGIN_INVALID_CREDENTIALS';
+              throw error;
+            } else {
+              const error = new Error("입력 정보를 확인해주세요.");
+              error.name = 'LOGIN_INVALID_INPUT';
+              throw error;
+            }
+          case 401:
+            // 인증 실패
+            const error401 = new Error("아이디 또는 비밀번호가 잘못되었습니다.");
+            error401.name = 'LOGIN_UNAUTHORIZED';
+            throw error401;
+          case 404:
+            // 계정을 찾을 수 없음
+            const error404 = new Error("존재하지 않는 계정입니다.");
+            error404.name = 'LOGIN_ACCOUNT_NOT_FOUND';
+            throw error404;
+          case 500:
+          case 502:
+          case 503:
+            // 서버 오류
+            const error5xx = new Error("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            error5xx.name = 'LOGIN_SERVER_ERROR';
+            throw error5xx;
+          default:
+            const errorDefault = new Error("로그인에 실패했습니다. 다시 시도해주세요.");
+            errorDefault.name = 'LOGIN_UNKNOWN_ERROR';
+            throw errorDefault;
+        }
+      } else if (err.request) {
+        // 네트워크 오류
+        const networkError = new Error("네트워크 연결을 확인해주세요.");
+        networkError.name = 'LOGIN_NETWORK_ERROR';
+        throw networkError;
+      } else {
+        // 기타 오류
+        const otherError = new Error("로그인에 실패했습니다. 다시 시도해주세요.");
+        otherError.name = 'LOGIN_OTHER_ERROR';
+        throw otherError;
+      }
     }
   }
 

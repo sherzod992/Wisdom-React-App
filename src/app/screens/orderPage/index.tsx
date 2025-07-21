@@ -141,6 +141,23 @@ export default function OrdersPage() {
     localStorage.setItem('pausedOrders', JSON.stringify(updatedPausedOrders));
   };
 
+  const handleRefundOrder = (orderItems: OrderItem[]) => {
+    console.log("Starting refund process for items:", orderItems.map(item => item._id));
+    
+    // finished orders에서 제거 (구매 취소)
+    const updatedFinishedOrders = finishedOrders.filter(
+      finishedItem => !orderItems.some(item => item._id === finishedItem._id)
+    );
+
+    // 상태 업데이트
+    setFinishedOrders(updatedFinishedOrders);
+    
+    // 로컬 스토리지 업데이트
+    localStorage.setItem('finishedOrders', JSON.stringify(updatedFinishedOrders));
+    
+    console.log("Refund completed. Items removed from finished orders.");
+  };
+
   return (
     <div className={"order-page"}>
       <Container className="order-container">
@@ -165,7 +182,10 @@ export default function OrdersPage() {
                 onPayment={handlePayment}
                 onCancel={handleCancelOrder}
               />
-              <FinishedOrders orders={finishedOrders} />
+              <FinishedOrders 
+                orders={finishedOrders} 
+                onRefund={handleRefundOrder}
+              />
             </Stack>
           </TabContext>
         </Stack>

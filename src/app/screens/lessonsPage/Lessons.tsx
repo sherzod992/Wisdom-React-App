@@ -5,10 +5,11 @@ import CardCover from "@mui/joy/CardCover";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import { CssVarsProvider } from "@mui/joy/styles";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import { AspectRatio, CardOverflow, Divider, Button as JoyButton } from "@mui/joy";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // Add this import for a money icon
 
@@ -82,10 +83,39 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
     setModalOpen(false);
   };
 
-  const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
+  const handleDirectPurchase = async (e: React.MouseEvent, lesson: Lesson) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
     
-    // 이미 장바구니에 있는지 확인
+    // 이미 구매했는지 확인
+    if (isPurchased(lesson._id)) {
+      await sweetTopSuccessAlert(`${lesson.lessonName}은(는) 이미 구매한 강의입니다!`, 2000);
+      return;
+    }
+    
+    // 바로 구매 처리 - pausedOrders에 추가
+    const orderItem = {
+      _id: lesson._id,
+      name: lesson.lessonName,
+      price: lesson.lessonPrice,
+      image: lesson.lessonImages?.[0] || "",
+      quantity: 1,
+      orderId: `order_${Date.now()}`,
+      status: 'paused' as const,
+      orderDate: new Date(),
+    };
+    
+    // localStorage에 pausedOrders 저장
+    const existingPausedOrders = localStorage.getItem('pausedOrders');
+    const pausedOrders = existingPausedOrders ? JSON.parse(existingPausedOrders) : [];
+    pausedOrders.push(orderItem);
+    localStorage.setItem('pausedOrders', JSON.stringify(pausedOrders));
+    
+    await sweetTopSuccessAlert(`${lesson.lessonName}이(가) 주문목록에 추가되었습니다! 주문 페이지에서 결제를 완료해주세요.`, 3000);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
+    e.stopPropagation(); // 카드 클릭 방지
+    
     const exist = cartItems.find(item => item._id === lesson._id);
     
     if (exist) {
@@ -95,7 +125,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
     
     const cartItem: CartItem = {
       _id: lesson._id,
-      name: lesson.lessonName, // lessonTitle 대신 lessonName 사용
+      name: lesson.lessonName,
       price: lesson.lessonPrice,
       image: lesson.lessonImages?.[0] || "",
       quantity: 1
@@ -207,15 +237,29 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                                 alt={lesson.lessonTitle}
                               />
                             </AspectRatio>
-                            {/* 장바구니 버튼 또는 구매 완료 표시 */}
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: 10,
-                                right: 10,
-                                zIndex: 1,
-                              }}
-                            >
+
+                          </CardOverflow>
+
+                          <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <Box>
+                              <Typography
+                                sx={{
+                                  fontWeight: 'bold',
+                                  color: 'black',
+                                  fontSize: '1.3rem',
+                                  mb: 0.5
+                                }}
+                              >
+                                ${lesson.lessonPrice}
+                              </Typography>
+                              <Typography level="title-md">{lesson.lessonTitle}</Typography>
+                              <Typography level="body-xs" sx={{ mt: 0.5 }}>
+                                {lesson.lessonName} Lessons
+                              </Typography>
+                            </Box>
+                            
+                            {/* 버튼들을 가격 반대편에 배치 */}
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
                               {isPurchased(lesson._id) ? (
                                 <JoyButton
                                   variant="soft"
@@ -226,6 +270,8 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                                     backgroundColor: "rgba(76, 175, 80, 0.2)",
                                     color: "#4caf50",
                                     cursor: "default",
+                                    fontSize: "0.7rem",
+                                    padding: "3px 6px",
                                     "&:hover": {
                                       backgroundColor: "rgba(76, 175, 80, 0.2)",
                                     }
@@ -235,34 +281,44 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                                   구매완료
                                 </JoyButton>
                               ) : (
-                                <JoyButton
-                                  variant="solid"
-                                  size="sm"
-                                  startDecorator={<ShoppingCartIcon />}
-                                  onClick={(e) => handleAddToCart(e, lesson)}
-                                  className="cart-button"
-                                >
-                                  장바구니
-                                </JoyButton>
+                                <>
+                                  <JoyButton
+                                    variant="solid"
+                                    size="sm"
+                                    startDecorator={<LocalMallIcon />}
+                                    onClick={(e) => handleDirectPurchase(e, lesson)}
+                                    sx={{
+                                      fontSize: "0.7rem",
+                                      padding: "3px 6px",
+                                      backgroundColor: "#FF6B6B",
+                                      "&:hover": {
+                                        backgroundColor: "#FF5252",
+                                      }
+                                    }}
+                                    className="purchase-button"
+                                  >
+                                    구매하기
+                                  </JoyButton>
+                                  <JoyButton
+                                    variant="solid"
+                                    size="sm"
+                                    startDecorator={<ShoppingCartIcon />}
+                                    onClick={(e) => handleAddToCart(e, lesson)}
+                                    sx={{
+                                      fontSize: "0.7rem",
+                                      padding: "3px 6px",
+                                      backgroundColor: "#1976d2",
+                                      "&:hover": {
+                                        backgroundColor: "#1565c0",
+                                      }
+                                    }}
+                                    className="cart-button"
+                                  >
+                                    장바구니
+                                  </JoyButton>
+                                </>
                               )}
                             </Box>
-                          </CardOverflow>
-
-                          <CardContent>
-                            <Typography
-                              sx={{
-                                fontWeight: 'bold',
-                                color: 'black',
-                                fontSize: '1.3rem',
-                                mb: 0.5
-                              }}
-                            >
-                              ${lesson.lessonPrice}
-                            </Typography>
-                            <Typography level="title-md">{lesson.lessonTitle}</Typography>
-                            <Typography level="body-xs" sx={{ mt: 0.5 }}>
-                              {lesson.lessonName} Lessons
-                            </Typography>
                           </CardContent>
 
                           <CardOverflow variant="soft" sx={{ bgcolor: 'background.level2' }}>
@@ -279,14 +335,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                                   ? lesson.lessonDesc.slice(0, 30) + "..."
                                   : lesson.lessonDesc}
                               </Typography>
-                              <Typography
-                                level="body-xs"
-                                textColor="text.secondary"
-                                sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center' }}
-                              >
-                                {lesson.lessonViews}
-                                <VisibilityIcon sx={{ fontSize: 26, ml: 0.5 }} />
-                              </Typography>
+
                             </CardContent>
                           </CardOverflow>
                         </Card>

@@ -10,7 +10,7 @@ import { T } from "../../lib/types/common.ts";
 import { LoginInput, MemberInput } from "../../lib/types/member.ts";
 import MemberService from "../service/MemberService.ts"
 import { Messages } from "../../lib/types/config.ts";
-import { sweetErrorHandling } from "../../lib/sweetAlert.ts";
+import { sweetErrorHandling, sweetLoginErrorHandling, sweetSignupErrorHandling } from "../../lib/sweetAlert.ts";
 import { useGlobals } from "../../hooks/useGlobals.ts";
 
 // MUI modal style
@@ -85,7 +85,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       const isFulfill =
         memberNick !== "" && memberPhone !== "" && memberPassword !== "";
      
-      if (!isFulfill) throw new Error(Messages.error3);
+      if (!isFulfill) throw new Error("모든 필드를 입력해주세요.");
   
       const signupInput: MemberInput = {
         memberNick: memberNick,
@@ -100,14 +100,14 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
     } catch (err) {
       console.log(err);
       handleSignupClose();
-      sweetErrorHandling(err).then();
+      sweetSignupErrorHandling(err).then();
     }
   };
   const handleLoginRequest = async () => {
     try {
       const isFulfill =
         memberNick !== "" && memberPassword !== "";
-      if (!isFulfill) throw new Error(Messages.error3);
+      if (!isFulfill) throw new Error("아이디와 비밀번호를 입력해주세요.");
       const loginInput: LoginInput = {
         memberNick: memberNick,
         memberPassword: memberPassword,
@@ -119,7 +119,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
     } catch (err) {
       console.log(err);
       handleLoginClose(); 
-      sweetErrorHandling(err).then()
+      sweetLoginErrorHandling(err).then()
     }
   };
 

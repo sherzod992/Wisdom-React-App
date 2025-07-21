@@ -15,9 +15,10 @@ import {
   AspectRatio,
   CssVarsProvider
 } from "@mui/joy";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
@@ -63,6 +64,36 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
     setModalOpen(false);
   };
 
+  const handleDirectPurchase = async (e: React.MouseEvent, lesson: Lesson) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    // 이미 구매했는지 확인
+    if (isPurchased(lesson._id)) {
+      await sweetTopSuccessAlert(`${lesson.lessonName}은(는) 이미 구매한 강의입니다!`, 2000);
+      return;
+    }
+    
+    // 바로 구매 처리 - pausedOrders에 추가
+    const orderItem = {
+      _id: lesson._id,
+      name: lesson.lessonName,
+      price: lesson.lessonPrice,
+      image: lesson.lessonImages?.[0] || "",
+      quantity: 1,
+      orderId: `order_${Date.now()}`,
+      status: 'paused' as const,
+      orderDate: new Date(),
+    };
+    
+    // localStorage에 pausedOrders 저장
+    const existingPausedOrders = localStorage.getItem('pausedOrders');
+    const pausedOrders = existingPausedOrders ? JSON.parse(existingPausedOrders) : [];
+    pausedOrders.push(orderItem);
+    localStorage.setItem('pausedOrders', JSON.stringify(pausedOrders));
+    
+    await sweetTopSuccessAlert(`${lesson.lessonName}이(가) 주문목록에 추가되었습니다! 주문 페이지에서 결제를 완료해주세요.`, 3000);
+  };
+
   const handleAddToCart = async (e: React.MouseEvent, lesson: Lesson) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
     
@@ -76,7 +107,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
     
     const cartItem: CartItem = {
       _id: lesson._id,
-      name: lesson.lessonName, // lessonTitle 대신 lessonName 사용
+      name: lesson.lessonName,
       price: lesson.lessonPrice,
       image: lesson.lessonImages?.[0] || "",
       quantity: 1
@@ -112,54 +143,35 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                             alt={lesson.lessonTitle || lesson.lessonName || 'Lesson'}
                           />
                         </AspectRatio>
-                        {/* 장바구니 버튼 또는 구매 완료 표시 */}
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            top: 8,
-                            right: 8,
-                            zIndex: 1,
-                          }}
-                        >
-                          {isPurchased(lesson._id) ? (
-                            <Button
-                              variant="soft"
-                              size="sm"
-                              startDecorator={<CheckCircleIcon />}
-                              disabled
-                              sx={{
-                                backgroundColor: "rgba(76, 175, 80, 0.2)",
-                                color: "#4caf50",
-                                cursor: "default",
-                                fontSize: "0.75rem",
-                                padding: "4px 8px",
-                                "&:hover": {
-                                  backgroundColor: "rgba(76, 175, 80, 0.2)",
-                                }
-                              }}
-                              className="purchased-button"
-                            >
-                              구매완료
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="solid"
-                              size="sm"
-                              startDecorator={<ShoppingCartIcon />}
-                              onClick={(e) => handleAddToCart(e, lesson)}
-                              sx={{
-                                fontSize: "0.75rem",
-                                padding: "4px 8px",
-                              }}
-                              className="cart-button"
-                            >
-                              장바구니
-                            </Button>
-                          )}
-                        </Box>
+                        
+                        {/* 장바구니 버튼 - 제일 위쪽 */}
+                        {!isPurchased(lesson._id) && (
+                          <Button
+                            variant="solid"
+                            size="sm"
+                            startDecorator={<ShoppingCartIcon />}
+                            onClick={(e) => handleAddToCart(e, lesson)}
+                            sx={{
+                              position: "absolute",
+                              top: 8,
+                              right: 8,
+                              fontSize: "0.7rem",
+                              padding: "3px 6px",
+                              backgroundColor: "#1976d2",
+                              "&:hover": {
+                                backgroundColor: "#1565c0",
+                              },
+                              zIndex: 1,
+                            }}
+                            className="cart-button"
+                          >
+                            장바구니
+                          </Button>
+                        )}
+
                       </CardOverflow>
 
-                      <CardContent sx={{ padding: "12px" }}>
+                      <CardContent sx={{ padding: "12px", position: "relative" }}>
                         <Typography
                           sx={{
                             fontWeight: 'bold',
@@ -178,6 +190,53 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                         <Typography level="body-xs" sx={{ mt: 0.5, fontSize: "0.8rem" }}>
                           {lesson.lessonName || 'Unknown'} Lessons
                         </Typography>
+                        
+                        {/* 구매하기 버튼 또는 구매완료 버튼 */}
+                        {isPurchased(lesson._id) ? (
+                          <Button
+                            variant="soft"
+                            size="sm"
+                            startDecorator={<CheckCircleIcon />}
+                            disabled
+                            sx={{
+                              position: "absolute",
+                              top: 50,
+                              right: 8,
+                              backgroundColor: "rgba(76, 175, 80, 0.2)",
+                              color: "#4caf50",
+                              cursor: "default",
+                              fontSize: "0.7rem",
+                              padding: "3px 6px",
+                              "&:hover": {
+                                backgroundColor: "rgba(76, 175, 80, 0.2)",
+                              }
+                            }}
+                            className="purchased-button"
+                          >
+                            구매완료
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="solid"
+                            size="sm"
+                            startDecorator={<LocalMallIcon />}
+                            onClick={(e) => handleDirectPurchase(e, lesson)}
+                            sx={{
+                              position: "absolute",
+                              top: 50,
+                              right: 8,
+                              fontSize: "0.7rem",
+                              padding: "3px 6px",
+                              backgroundColor: "#FF6B6B",
+                              "&:hover": {
+                                backgroundColor: "#FF5252",
+                              }
+                            }}
+                            className="purchase-button"
+                          >
+                            구매하기
+                          </Button>
+                        )}
                       </CardContent>
 
                       <CardOverflow variant="soft" sx={{ bgcolor: 'background.level2', padding: "8px" }}>
@@ -194,14 +253,7 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                               ? lesson.lessonDesc.slice(0, 20) + "..."
                               : "No description"}
                           </Typography>
-                          <Typography
-                            level="body-xs"
-                            textColor="text.secondary"
-                            sx={{ fontWeight: 'md', display: 'flex', alignItems: 'center', fontSize: "0.75rem" }}
-                          >
-                            {lesson.lessonViews || 0}
-                            <VisibilityIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                          </Typography>
+
                         </CardContent>
                       </CardOverflow>
                     </Card>

@@ -1,8 +1,9 @@
 import React from "react";
 import TabPanel from "@mui/lab/TabPanel";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Button } from "@mui/material";
 import { CartItem } from "../../../lib/types/search.ts";
 import { serverApi } from "../../../lib/types/config.ts";
+import { sweetTopSuccessAlert, sweetErrorHandling } from "../../../lib/sweetAlert.ts";
 
 interface OrderItem extends CartItem {
   orderId?: string;
@@ -12,9 +13,10 @@ interface OrderItem extends CartItem {
 
 interface FinishedOrdersProps {
   orders: OrderItem[];
+  onRefund: (orderItems: OrderItem[]) => void;
 }
 
-export default function FinishedOrders({ orders }: FinishedOrdersProps) {
+export default function FinishedOrders({ orders, onRefund }: FinishedOrdersProps) {
     
     // 주문들을 orderId로 그룹핑
     const groupedOrders = orders.reduce((acc, order) => {
@@ -25,6 +27,15 @@ export default function FinishedOrders({ orders }: FinishedOrdersProps) {
         acc[orderId].push(order);
         return acc;
     }, {} as Record<string, OrderItem[]>);
+
+    const handleRefund = async (orderItems: OrderItem[]) => {
+        try {
+            onRefund(orderItems);
+            await sweetTopSuccessAlert("구매가 취소되었습니다. 해당 강의를 다시 구매할 수 있습니다.", 3000);
+        } catch (error) {
+            sweetErrorHandling(error);
+        }
+    };
 
     return (
         <TabPanel value={"2"}>
@@ -69,12 +80,31 @@ export default function FinishedOrders({ orders }: FinishedOrdersProps) {
                                     <Box sx={{ 
                                         display: 'flex', 
                                         alignItems: 'center', 
-                                        justifyContent: 'center', 
-                                        color: 'green', 
-                                        fontWeight: 'bold',
+                                        justifyContent: 'space-between', 
                                         mt: 2 
                                     }}>
-                                        ✅ 결제 완료
+                                        <Box sx={{ 
+                                            color: 'green', 
+                                            fontWeight: 'bold'
+                                        }}>
+                                            ✅ 결제 완료
+                                        </Box>
+                                        <Button 
+                                            variant="outlined" 
+                                            color="error" 
+                                            size="small"
+                                            onClick={() => handleRefund(orderItems)}
+                                            sx={{
+                                                borderColor: "#FF6B6B",
+                                                color: "#FF6B6B",
+                                                "&:hover": {
+                                                    borderColor: "#FF5252",
+                                                    backgroundColor: "rgba(255, 107, 107, 0.04)",
+                                                }
+                                            }}
+                                        >
+                                            구매취소
+                                        </Button>
                                     </Box>
                                 </Box>
                             </Box>
