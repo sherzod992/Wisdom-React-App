@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { serverApi } from "../../lib/types/config.ts";
-import { Lesson, LessonInquiry } from "../../lib/types/lesson.ts";
+import { Order, OrderItemInput } from "../../lib/types/order.ts";
 
-class LessonService {
+class OrderService {
   private readonly path: string;
   private readonly api: AxiosInstance;
 
@@ -44,41 +44,45 @@ class LessonService {
     );
   }
 
-  public async getLessons(input: LessonInquiry): Promise<Lesson[]> {
+  public async createOrder(orderItems: OrderItemInput[]): Promise<Order> {
     try {
-      let url = `/product/all?order=${input.order}&page=${input.page}&limit=${input.limit}`;
-
-      if (input.lessonCollection) {
-        url += `&lessonCollection=${input.lessonCollection}`;
-      }
-
-      if (input.search) {
-        url += `&search=${input.search}`;
-      }
-
-      console.log("GET Lessons URL:", `${this.path}${url}`);
-      const result = await this.api.get(url);
-      console.log("getLessons response:", result.data);
+      const url = `/order/create`;
+      console.log("Creating order with items:", orderItems);
+      
+      const result = await this.api.post(url, { orderItems });
+      console.log("createOrder response:", result.data);
       return result.data;
     } catch (err) {
-      console.error("getLessons Error:", err);
+      console.error("createOrder Error:", err);
       throw err;
     }
   }
 
-  public async getLesson(lessonId: string): Promise<Lesson> {
+  public async getMyOrders(): Promise<Order[]> {
     try {
-      const url = `/product/${lessonId}`;
-      console.log("GET Lesson URL:", `${this.path}${url}`);
-
+      const url = `/order/all`;
       const result = await this.api.get(url);
-      console.log("getLesson response:", result.data);
+      console.log("getMyOrders response:", result.data);
       return result.data;
     } catch (err) {
-      console.error("getLesson Error:", err);
+      console.error("getMyOrders Error:", err);
+      throw err;
+    }
+  }
+
+  public async updateOrder(orderId: string, orderData: Partial<Order>): Promise<Order> {
+    try {
+      const url = `/order/update`;
+      console.log("Updating order:", orderId, orderData);
+      
+      const result = await this.api.post(url, { orderId, ...orderData });
+      console.log("updateOrder response:", result.data);
+      return result.data;
+    } catch (err) {
+      console.error("updateOrder Error:", err);
       throw err;
     }
   }
 }
 
-export default LessonService;
+export default OrderService; 

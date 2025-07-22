@@ -1,18 +1,53 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { serverApi } from "../../lib/types/config.ts";
 import { LoginInput, Member, MemberInput } from "../../lib/types/member.ts";
 
 class MemberService {
   private readonly path: string;
+  private readonly api: AxiosInstance;
 
   constructor() {
     this.path = serverApi;
+    
+    // axios 인스턴스 생성 및 기본 설정
+    this.api = axios.create({
+      baseURL: this.path,
+      withCredentials: true,
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    // 요청 인터셉터
+    this.api.interceptors.request.use(
+      (config) => {
+        console.log(`🚀 API 요청: ${config.method?.toUpperCase()} ${config.url}`);
+        return config;
+      },
+      (error) => {
+        console.error("❌ 요청 오류:", error);
+        return Promise.reject(error);
+      }
+    );
+
+    // 응답 인터셉터
+    this.api.interceptors.response.use(
+      (response) => {
+        console.log(`✅ API 응답: ${response.status} ${response.config.url}`);
+        return response;
+      },
+      (error) => {
+        console.error(`❌ API 오류: ${error.response?.status} ${error.config?.url}`, error.response?.data);
+        return Promise.reject(error);
+      }
+    );
   }
 
   public async getTopUsers(): Promise<Member[]> {
     try {
-      const url = `${this.path}/member/top-users`;
-      const result = await axios.get(url);
+      const url = `/member/top-users`;
+      const result = await this.api.get(url);
       console.log("getTopUsers:", result.data);
       return result.data;
     } catch (err) {
@@ -23,8 +58,8 @@ class MemberService {
 
   public async getCurrentMember(): Promise<Member> {
     try {
-      const url = `${this.path}/member/detail`;
-      const result = await axios.get(url, { withCredentials: true });
+      const url = `/member/detail`;
+      const result = await this.api.get(url);
       console.log("getCurrentMember:", result.data);
       return result.data;
     } catch (err) {
@@ -35,8 +70,8 @@ class MemberService {
 
   public async signup(input: MemberInput): Promise<Member> {
     try {
-      const url = `${this.path}/member/signup`;
-      const result = await axios.post(url, input, { withCredentials: true });
+      const url = `/member/signup`;
+      const result = await this.api.post(url, input);
       const member: Member = result.data.member;
       try {
         if (member && typeof member === 'object') {
@@ -102,8 +137,8 @@ class MemberService {
 
   public async login(input: LoginInput): Promise<Member> {
     try {
-      const url = `${this.path}/member/login`;
-      const result = await axios.post(url, input, { withCredentials: true });
+      const url = `/member/login`;
+      const result = await this.api.post(url, input);
       const member: Member = result.data.member;
       
       try {
@@ -170,14 +205,11 @@ class MemberService {
 
   public async logout(): Promise<void> {
     try {
-      const url = `${this.path}/member/logout`;
-      console.log("로그아웃 요청 URL:", url);
+      const url = `/member/logout`;
+      console.log("로그아웃 요청 URL:", `${this.path}${url}`);
       
       // 타임아웃 설정 (5초)
-      const result = await axios.post(url, {}, { 
-        withCredentials: true,
-        timeout: 5000 
-      });
+      const result = await this.api.post(url, {}, { timeout: 5000 });
       
       localStorage.removeItem("memberData");
       console.log("로그아웃 응답:", result.data);
@@ -198,22 +230,22 @@ class MemberService {
       }
     }
   }
+
   public async updateMember(input: FormData | Partial<Member>): Promise<Member> {
     try {
-      const url = `${this.path}/member/update`;
-      console.log("UpdateMember URL:", url);
+      const url = `/member/update`;
+      console.log("UpdateMember URL:", `${this.path}${url}`);
       console.log("UpdateMember input type:", input instanceof FormData ? "FormData" : "JSON");
       
       const config = {
         headers: {
           "Content-Type": input instanceof FormData ? "multipart/form-data" : "application/json",
         },
-        withCredentials: true,
         timeout: 30000, // 30초 타임아웃
       };
       
       console.log("Sending update request...");
-      const result = await axios.post(url, input, config);
+      const result = await this.api.post(url, input, config);
       console.log("Update response status:", result.status);
       console.log("Update response data:", result.data);
       console.log("Response data structure:", {
@@ -301,10 +333,6 @@ class MemberService {
       throw err;
     }
   }
-  
-  
-  }
-  
-
+}
 
 export default MemberService;

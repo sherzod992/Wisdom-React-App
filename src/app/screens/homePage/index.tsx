@@ -49,8 +49,11 @@ export default function HomePage({ onAdd }: HomePageProps) {
         page: 1,
         limit: 5,
       })
-      .then((data) => setPopularLessons(data))
-      .catch((err) => console.error("Popular lessons error:", err));
+      .then((data) => {
+        console.log("✅ Popular Lessons 로딩:", data);
+        setPopularLessons(data);
+      })
+      .catch((err) => console.error("❌ Popular lessons error:", err));
 
     // ✅ New Lessons - 최신 업로드 순으로 정렬
     lessonService
@@ -59,15 +62,21 @@ export default function HomePage({ onAdd }: HomePageProps) {
         limit: 8,
         order: "createdAt", // 최신 업로드 순
       })
-      .then((data) => setNewLessons(data))
-      .catch((err) => console.error("New lessons error:", err));
+      .then((data) => {
+        console.log("✅ New Lessons 로딩:", data);
+        setNewLessons(data);
+      })
+      .catch((err) => console.error("❌ New lessons error:", err));
 
     // ✅ Top Users - Events용 강의 데이터로 활용
     const memberService = new MemberService();
     memberService
       .getTopUsers()
-      .then((data) => setTopUsers(data))
-      .catch((err) => console.error("Top users error:", err));
+      .then((data) => {
+        console.log("✅ Top Users 로딩:", data);
+        setTopUsers(data);
+      })
+      .catch((err) => console.error("❌ Top users error:", err));
   }, []);
 
   return (

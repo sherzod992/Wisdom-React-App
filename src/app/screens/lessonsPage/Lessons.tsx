@@ -55,14 +55,33 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
   const loadLessons = async () => {
     setLoading(true);
     try {
+      console.log("🔄 강의 데이터 로딩 시작...");
       const lessonService = new LessonService();
       const data = await lessonService.getLessons({
         page: 1,
         limit: 20, // 더 많은 강의를 가져오기
       });
-      setLessons(data);
+      
+      console.log("📚 받은 강의 데이터:", data);
+      console.log("📊 강의 개수:", data?.length || 0);
+      
+      if (data && Array.isArray(data)) {
+        setLessons(data);
+        if (data.length === 0) {
+          console.log("⚠️ 강의 데이터가 비어있습니다");
+        }
+      } else {
+        console.error("❌ 올바르지 않은 데이터 형식:", data);
+        setLessons([]);
+      }
     } catch (error) {
-      console.error("강의 데이터 로딩 실패:", error);
+      console.error("❌ 강의 데이터 로딩 실패:", error);
+      console.error("에러 세부사항:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      setLessons([]);
     } finally {
       setLoading(false);
     }
@@ -344,7 +363,38 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
                   })}
                 </Box>
               ) : (
-                <Box className="lessons-no-data">강의가 없습니다!</Box>
+                <Box className="lessons-no-data" sx={{ 
+                  textAlign: 'center', 
+                  padding: 4,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 2,
+                  margin: 2
+                }}>
+                  <Typography level="h2" sx={{ mb: 2 }}>
+                    😔 강의를 찾을 수 없습니다
+                  </Typography>
+                  <Typography level="body-md" sx={{ mb: 3, color: 'text.secondary' }}>
+                    현재 등록된 강의가 없거나 백엔드 서버에서 데이터를 가져올 수 없습니다.
+                  </Typography>
+                  <Stack direction="row" spacing={2} justifyContent="center">
+                    <Button 
+                      variant="contained" 
+                      onClick={loadLessons}
+                      disabled={loading}
+                    >
+                      다시 시도하기
+                    </Button>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => window.location.href = '/'}
+                    >
+                      홈으로 돌아가기
+                    </Button>
+                  </Stack>
+                  <Typography level="body-xs" sx={{ mt: 2, display: 'block', color: 'text.secondary' }}>
+                    문제가 지속되면 브라우저 콘솔(F12)에서 에러 메시지를 확인하세요.
+                  </Typography>
+                </Box>
               )}
             </Box>
           </Box>

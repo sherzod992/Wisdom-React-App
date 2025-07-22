@@ -6,11 +6,11 @@ import Fade from "@material-ui/core/Fade";
 import { Fab, Stack, TextField } from "@mui/material";
 import styled from "styled-components";
 import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { T } from "../../lib/types/common.ts";
 import { LoginInput, MemberInput } from "../../lib/types/member.ts";
-import MemberService from "../service/MemberService.ts"
-import { Messages } from "../../lib/types/config.ts";
-import { sweetErrorHandling, sweetLoginErrorHandling, sweetSignupErrorHandling } from "../../lib/sweetAlert.ts";
+import MemberService from "../service/MemberService.ts";
+import { sweetLoginErrorHandling, sweetSignupErrorHandling } from "../../lib/sweetAlert.ts";
 import { useGlobals } from "../../hooks/useGlobals.ts";
 
 // MUI modal style
@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Modalda ko'rinadigan rasm
 const ModalImg = styled.img`
   width: 62%;
   height: 100%;
@@ -49,89 +48,110 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
   const { signupOpen, loginOpen, handleSignupClose, handleLoginClose } = props;
   const classes = useStyles();
 
+  // 상태 관리
   const [memberNick, setMemberNick] = useState<string>("");
   const [memberPhone, setMemberPhone] = useState<string>("");
-  const [memberPassword, setMeberPassword] = useState<string>("");
-  const {setAuthMember}=useGlobals();
+  const [memberPassword, setMemberPassword] = useState<string>("");
+  const { setAuthMember } = useGlobals();
 
-  // Input handlerlar
+  // Input 핸들러들
   const handleUserName = (e: T) => {
-    console.log(e.target.value);
     setMemberNick(e.target.value);
   };
 
-  const handleUsePhone = (e: T) => {
-    console.log(e.target.value);
+  const handleUserPhone = (e: T) => {
     setMemberPhone(e.target.value);
   };
 
   const handlePassword = (e: T) => {
-    console.log(e.target.value);
-    setMeberPassword(e.target.value);
+    setMemberPassword(e.target.value);
   };
 
-  const handelePasswordOneKeyDown=(e:T)=>{
-    if(e.key==="Enter"&&signupOpen){
-      handleSignupRequest().then();
-    } else if (e.key==="Enter"&&loginOpen){
-      handleLoginRequest().then();
+  // Enter 키 처리
+  const handleKeyDown = (e: T) => {
+    if (e.key === "Enter") {
+      if (signupOpen) {
+        handleSignupRequest();
+      } else if (loginOpen) {
+        handleLoginRequest();
+      }
     }
-  }
+  };
+
+  // 입력값 초기화
+  const resetInputs = () => {
+    setMemberNick("");
+    setMemberPhone("");
+    setMemberPassword("");
+  };
 
   // 회원가입 요청
   const handleSignupRequest = async () => {
     try {
-      console.log("inputs:", memberNick, memberPhone, memberPassword);
-  
-      const isFulfill =
-        memberNick !== "" && memberPhone !== "" && memberPassword !== "";
-     
-      if (!isFulfill) throw new Error("모든 필드를 입력해주세요.");
-  
+      // 입력값 검증
+      const isFulfilled = memberNick !== "" && memberPhone !== "" && memberPassword !== "";
+      
+      if (!isFulfilled) {
+        throw new Error("모든 필드를 입력해주세요.");
+      }
+
       const signupInput: MemberInput = {
         memberNick: memberNick,
         memberPhone: memberPhone,
         memberPassword: memberPassword,
       };
-  
-      const member = new MemberService();
-      const result = await member.signup(signupInput);
+
+      const memberService = new MemberService();
+      const result = await memberService.signup(signupInput);
+      
       setAuthMember(result);
-      handleSignupClose(); 
-    } catch (err) {
-      console.log(err);
+      resetInputs();
       handleSignupClose();
-      sweetSignupErrorHandling(err).then();
+      
+    } catch (err) {
+      console.error("회원가입 에러:", err);
+      handleSignupClose();
+      resetInputs();
+      await sweetSignupErrorHandling(err);
     }
   };
 
   // 로그인 요청
   const handleLoginRequest = async () => {
     try {
-      const isFulfill =
-        memberNick !== "" && memberPassword !== "";
-      if (!isFulfill) throw new Error("아이디와 비밀번호를 입력해주세요.");
+      // 입력값 검증
+      const isFulfilled = memberNick !== "" && memberPassword !== "";
+      
+      if (!isFulfilled) {
+        throw new Error("아이디와 비밀번호를 입력해주세요.");
+      }
+
       const loginInput: LoginInput = {
         memberNick: memberNick,
         memberPassword: memberPassword,
       };
-      const member = new MemberService();
-      const result = await member.login(loginInput);
-      setAuthMember(result); 
-      handleLoginClose(); 
+
+      const memberService = new MemberService();
+      const result = await memberService.login(loginInput);
+      
+      setAuthMember(result);
+      resetInputs();
+      handleLoginClose();
+      
     } catch (err) {
-      console.log(err);
-      handleLoginClose(); 
-      sweetLoginErrorHandling(err).then()
+      console.error("로그인 에러:", err);
+      handleLoginClose();
+      resetInputs();
+      await sweetLoginErrorHandling(err);
     }
   };
 
   return (
     <div>
-      {/* === SIGNUP MODAL === */}
+      {/* === 회원가입 모달 === */}
       <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
+        aria-labelledby="signup-modal-title"
+        aria-describedby="signup-modal-description"
         className={classes.modal}
         open={signupOpen}
         onClose={handleSignupClose}
@@ -141,52 +161,57 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       >
         <Fade in={signupOpen}>
           <Stack className={classes.paper} direction="row" sx={{ width: "800px" }}>
-            <ModalImg src="/img/auth.webp" alt="camera" />
+            <ModalImg src="/img/auth.webp" alt="회원가입" />
             <Stack sx={{ marginLeft: "69px", alignItems: "center" }}>
-              <h2>Signup Form</h2>
+              <h2>회원가입</h2>
               <TextField
                 sx={{ marginTop: "7px" }}
                 id="signup-username"
-                label="Username"
+                label="닉네임"
+                placeholder="사용자 이름을 입력하세요"
                 variant="outlined"
+                value={memberNick}
                 onChange={handleUserName}
-                onKeyDown={handelePasswordOneKeyDown}
+                onKeyDown={handleKeyDown}
               />
               <TextField
                 sx={{ my: "17px" }}
                 id="signup-phone"
-                label="Phone Number"
+                label="전화번호"
+                placeholder="01012345678"
                 variant="outlined"
-                onChange={handleUsePhone}
-                onKeyDown={handelePasswordOneKeyDown}
+                value={memberPhone}
+                onChange={handleUserPhone}
+                onKeyDown={handleKeyDown}
               />
               <TextField
                 id="signup-password"
-                label="Password"
+                label="비밀번호"
+                placeholder="비밀번호를 입력하세요"
                 variant="outlined"
                 type="password"
+                value={memberPassword}
                 onChange={handlePassword}
-                onKeyDown={handelePasswordOneKeyDown}
+                onKeyDown={handleKeyDown}
               />
               <Fab
                 sx={{ marginTop: "30px", width: "120px" }}
                 variant="extended"
                 color="primary"
                 onClick={handleSignupRequest}
-                onKeyDown={handelePasswordOneKeyDown}
               >
-                <LoginIcon sx={{ mr: 1 }} />
-                Signup
+                <PersonAddIcon sx={{ mr: 1 }} />
+                회원가입
               </Fab>
             </Stack>
           </Stack>
         </Fade>
       </Modal>
 
-      {/* === LOGIN MODAL === */}
+      {/* === 로그인 모달 === */}
       <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
+        aria-labelledby="login-modal-title"
+        aria-describedby="login-modal-description"
         className={classes.modal}
         open={loginOpen}
         onClose={handleLoginClose}
@@ -196,7 +221,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       >
         <Fade in={loginOpen}>
           <Stack className={classes.paper} direction="row" sx={{ width: "700px" }}>
-            <ModalImg src="/img/auth.webp" alt="camera" />
+            <ModalImg src="/img/auth.webp" alt="로그인" />
             <Stack
               sx={{
                 marginLeft: "65px",
@@ -204,33 +229,35 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
                 alignItems: "center",
               }}
             >
-              <h2>Login Form</h2>
+              <h2>로그인</h2>
               <TextField
                 id="login-username"
-                label="Username"
+                label="닉네임"
+                placeholder="사용자 이름을 입력하세요"
                 variant="outlined"
                 sx={{ my: "10px" }}
+                value={memberNick}
                 onChange={handleUserName}
-                onKeyDown={handelePasswordOneKeyDown}
+                onKeyDown={handleKeyDown}
               />
               <TextField
                 id="login-password"
-                label="Password"
+                label="비밀번호"
+                placeholder="비밀번호를 입력하세요"
                 variant="outlined"
                 type="password"
+                value={memberPassword}
                 onChange={handlePassword}
-                onKeyDown={handelePasswordOneKeyDown}
+                onKeyDown={handleKeyDown}
               />
               <Fab
                 sx={{ marginTop: "27px", width: "120px" }}
                 variant="extended"
                 color="primary"
                 onClick={handleLoginRequest}
-                onKeyDown={handelePasswordOneKeyDown}
-
               >
                 <LoginIcon sx={{ mr: 1 }} />
-                Login
+                로그인
               </Fab>
             </Stack>
           </Stack>
