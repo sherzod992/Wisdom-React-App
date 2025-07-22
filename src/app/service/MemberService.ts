@@ -105,6 +105,7 @@ class MemberService {
       const url = `${this.path}/member/login`;
       const result = await axios.post(url, input, { withCredentials: true });
       const member: Member = result.data.member;
+      
       try {
         if (member && typeof member === 'object') {
           localStorage.setItem("memberData", JSON.stringify(member));
@@ -124,7 +125,6 @@ class MemberService {
         
         switch (status) {
           case 400:
-            // 잘못된 요청 (아이디/비밀번호 오류)
             if (serverMessage.includes('Please try again') || 
                 serverMessage.includes('Invalid credentials') ||
                 serverMessage.includes('Wrong password') ||
@@ -138,19 +138,16 @@ class MemberService {
               throw error;
             }
           case 401:
-            // 인증 실패
             const error401 = new Error("아이디 또는 비밀번호가 잘못되었습니다.");
             error401.name = 'LOGIN_UNAUTHORIZED';
             throw error401;
           case 404:
-            // 계정을 찾을 수 없음
             const error404 = new Error("존재하지 않는 계정입니다.");
             error404.name = 'LOGIN_ACCOUNT_NOT_FOUND';
             throw error404;
           case 500:
           case 502:
           case 503:
-            // 서버 오류
             const error5xx = new Error("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             error5xx.name = 'LOGIN_SERVER_ERROR';
             throw error5xx;
@@ -160,12 +157,10 @@ class MemberService {
             throw errorDefault;
         }
       } else if (err.request) {
-        // 네트워크 오류
         const networkError = new Error("네트워크 연결을 확인해주세요.");
         networkError.name = 'LOGIN_NETWORK_ERROR';
         throw networkError;
       } else {
-        // 기타 오류
         const otherError = new Error("로그인에 실패했습니다. 다시 시도해주세요.");
         otherError.name = 'LOGIN_OTHER_ERROR';
         throw otherError;

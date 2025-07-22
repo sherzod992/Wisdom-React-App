@@ -1,9 +1,6 @@
 
 import { MemberStatus, MemberType } from "../enums/member.enum";
 
-
-
-
 export interface Member{
     _id: string;
     memberType: MemberType;
@@ -19,7 +16,6 @@ export interface Member{
     updatedAt:Date;
 }
 
-
 export interface MemberInput{
     memberType?: MemberType;
     memberStatus?: MemberStatus;
@@ -30,7 +26,6 @@ export interface MemberInput{
     memberDesk?:string;
     memberImage?:string;
     memberPoints?:number;
-
 }
 
 export interface LoginInput{
@@ -47,12 +42,6 @@ export interface MemberUpdateInput{
     memberAddress?:string;
     memberDesk?:string;
     memberImage?:string;
-
 }
-
-
-
-
-
 
 /**Lesson ts */

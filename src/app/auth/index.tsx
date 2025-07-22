@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Modalda ko‘rinadigan rasm
+// Modalda ko'rinadigan rasm
 const ModalImg = styled.img`
   width: 62%;
   height: 100%;
@@ -48,7 +48,6 @@ interface AuthenticationModalProps {
 export default function AuthenticationModal(props: AuthenticationModalProps) {
   const { signupOpen, loginOpen, handleSignupClose, handleLoginClose } = props;
   const classes = useStyles();
-
 
   const [memberNick, setMemberNick] = useState<string>("");
   const [memberPhone, setMemberPhone] = useState<string>("");
@@ -70,6 +69,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
     console.log(e.target.value);
     setMeberPassword(e.target.value);
   };
+
   const handelePasswordOneKeyDown=(e:T)=>{
     if(e.key==="Enter"&&signupOpen){
       handleSignupRequest().then();
@@ -78,6 +78,7 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
     }
   }
 
+  // 회원가입 요청
   const handleSignupRequest = async () => {
     try {
       console.log("inputs:", memberNick, memberPhone, memberPassword);
@@ -103,6 +104,8 @@ export default function AuthenticationModal(props: AuthenticationModalProps) {
       sweetSignupErrorHandling(err).then();
     }
   };
+
+  // 로그인 요청
   const handleLoginRequest = async () => {
     try {
       const isFulfill =
