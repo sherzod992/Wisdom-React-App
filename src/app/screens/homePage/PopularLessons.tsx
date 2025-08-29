@@ -30,6 +30,7 @@ import VideoModal from "./VideoModal.tsx";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
 import useBasket from "../../../hooks/useBasket.ts";
 import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
+import { useGlobals } from "../../../hooks/useGlobals.ts";
 
 // Redux selector
 const popularLessonsRetriever = createSelector(
@@ -39,12 +40,14 @@ const popularLessonsRetriever = createSelector(
 
 interface PopularLessonsProps {
   onAdd: (item: CartItem) => void;
+  setLoginOpen?: (isOpen: boolean) => void;
 }
 
-export default function PopularLessons({ onAdd }: PopularLessonsProps) {
+export default function PopularLessons({ onAdd, setLoginOpen }: PopularLessonsProps) {
   const { popularLessons } = useSelector(popularLessonsRetriever);
   const { cartItems } = useBasket();
   const { isPurchased } = usePurchasedLessons();
+  const { authMember } = useGlobals();
   const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -66,6 +69,15 @@ export default function PopularLessons({ onAdd }: PopularLessonsProps) {
 
   const handleDirectPurchase = async (e: React.MouseEvent, lesson: Lesson) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    // 로그인 상태 확인
+    if (!authMember) {
+      await sweetTopSuccessAlert("로그인이 필요합니다. 로그인 모달이 열립니다.", 2000);
+      if (setLoginOpen) {
+        setLoginOpen(true);
+      }
+      return;
+    }
     
     // 이미 구매했는지 확인
     if (isPurchased(lesson._id)) {

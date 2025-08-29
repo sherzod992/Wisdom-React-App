@@ -28,6 +28,7 @@ import Welcome from "./welcome.tsx";
 
 interface HomePageProps {
   onAdd: (item: CartItem) => void;
+  setLoginOpen?: (isOpen: boolean) => void;
 }
 
 const actionDispatch = (dispatch: Dispatch) => ({
@@ -36,7 +37,7 @@ const actionDispatch = (dispatch: Dispatch) => ({
   setTopUsers: (data: Member[]) => dispatch(setTopUsers(data)),
 });
 
-export default function HomePage({ onAdd }: HomePageProps) {
+export default function HomePage({ onAdd, setLoginOpen }: HomePageProps) {
   const dispatch = useDispatch();
   const { setPopularLessons, setNewLessons, setTopUsers } = actionDispatch(dispatch);
 
@@ -83,8 +84,8 @@ export default function HomePage({ onAdd }: HomePageProps) {
     <div className="homepage">
       <Welcome />
       <PurchasedLessons />
-      <PopularLessons onAdd={onAdd} />
-      <NewLessons onAdd={onAdd} />
+      <PopularLessons onAdd={onAdd} setLoginOpen={setLoginOpen} />
+      <NewLessons onAdd={onAdd} setLoginOpen={setLoginOpen} />
       <Events />
     </div>
   );

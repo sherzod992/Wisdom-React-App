@@ -111,7 +111,7 @@ function App() {
 
       <Switch>
         <Route path="/lessons">
-          <LessonsPage onAdd={onAdd}/>
+          <LessonsPage onAdd={onAdd} setLoginOpen={setLoginOpen}/>
           {/* onAdd={onAdd} */}
         </Route>
         <Route path="/orders">
@@ -124,7 +124,7 @@ function App() {
           <HelpPage />
         </Route>
         <Route path="/" exact>
-          <HomePage onAdd={onAdd} />
+          <HomePage onAdd={onAdd} setLoginOpen={setLoginOpen} />
         </Route>
       </Switch>
 

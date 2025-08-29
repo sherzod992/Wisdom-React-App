@@ -15,6 +15,7 @@ import { CartItem } from "../../../lib/types/search.ts";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
 
 import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
+import { useGlobals } from "../../../hooks/useGlobals.ts";
 
 SwiperCore.use([Autoplay, Navigation, Pagination]);
 
@@ -26,6 +27,7 @@ const newLessonsRetriever = createSelector(
 export default function Events() {
   const { newLessons } = useSelector(newLessonsRetriever);
   const { isPurchased } = usePurchasedLessons();
+  const { authMember } = useGlobals();
   const [selectedVideos, setSelectedVideos] = useState<string[] | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,6 +51,12 @@ export default function Events() {
 
   const handleDirectPurchase = async (e: React.MouseEvent, lesson: Lesson) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    // 로그인 상태 확인
+    if (!authMember) {
+      await sweetTopSuccessAlert("로그인이 필요합니다. 로그인 모달이 열립니다.", 2000);
+      return;
+    }
     
     // 이미 구매했는지 확인
     if (isPurchased(lesson._id)) {

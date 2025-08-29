@@ -19,6 +19,7 @@ import { serverApi } from "../../../lib/types/config.ts";
 import { sweetTopSuccessAlert } from "../../../lib/sweetAlert.ts";
 import useBasket from "../../../hooks/useBasket.ts";
 import { usePurchasedLessons } from "../../../hooks/usePurchasedLessons.ts";
+import { useGlobals } from "../../../hooks/useGlobals.ts";
 import VideoModal from "./VideoModal.tsx";
 
 const newLessonsRetriever = createSelector (
@@ -27,12 +28,14 @@ const newLessonsRetriever = createSelector (
 
 interface NewLessonsProps {
   onAdd: (item: CartItem) => void;
+  setLoginOpen?: (isOpen: boolean) => void;
 }
 
-export default function NewLessons({ onAdd }: NewLessonsProps) {
+export default function NewLessons({ onAdd, setLoginOpen }: NewLessonsProps) {
     const {newLessons}= useSelector(newLessonsRetriever)
     const { cartItems } = useBasket();
     const { isPurchased } = usePurchasedLessons();
+    const { authMember } = useGlobals();
     
     // 안전한 기본값 설정
     const safeLessons = newLessons || [];
@@ -56,6 +59,15 @@ export default function NewLessons({ onAdd }: NewLessonsProps) {
 
     const handleDirectPurchase = async (e: React.MouseEvent, lesson: Lesson) => {
       e.stopPropagation(); // 카드 클릭 이벤트 방지
+      
+      // 로그인 상태 확인
+      if (!authMember) {
+        await sweetTopSuccessAlert("로그인이 필요합니다. 로그인 모달이 열립니다.", 2000);
+        if (setLoginOpen) {
+          setLoginOpen(true);
+        }
+        return;
+      }
       
       // 이미 구매했는지 확인
       if (isPurchased(lesson._id)) {

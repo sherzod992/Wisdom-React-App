@@ -7,22 +7,23 @@ import Lessons from "./Lessons.tsx";
 import '../../../css/PopularLessonsFilter.css'
 interface LessonPageProps {
   onAdd: (item: CartItem) => void;
+  setLoginOpen?: (isOpen: boolean) => void;
 }
 
-function LessonPageWrapper({ onAdd }: LessonPageProps) {
+function LessonPageWrapper({ onAdd, setLoginOpen }: LessonPageProps) {
   const { productId } = useParams<{ productId: string }>();
-  return <Lessons onAdd={onAdd} />;
+  return <Lessons onAdd={onAdd} setLoginOpen={setLoginOpen} />;
 }
 
-export default function LessonsPage({ onAdd }: LessonPageProps) {
+export default function LessonsPage({ onAdd, setLoginOpen }: LessonPageProps) {
   return (
     <div className="products-page">
       <Switch>
         <Route path="/lessons/:lessonId">
-          <LessonPageWrapper onAdd={onAdd} />
+          <LessonPageWrapper onAdd={onAdd} setLoginOpen={setLoginOpen} />
         </Route>
         <Route path="/lessons" exact>
-          <Lessons onAdd={onAdd} />
+          <Lessons onAdd={onAdd} setLoginOpen={setLoginOpen} />
         </Route>
       </Switch>
     </div>
